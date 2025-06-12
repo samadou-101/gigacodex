@@ -1,0 +1,42 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "moduleDetection": "force",
+    "lib": ["ES2022"],
+    "outDir": "./dist",
+    "rootDir": "./",
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "resolveJsonModule": true,
+    "sourceMap": true,
+    "declaration": true,
+    "removeComments": true,
+    "incremental": true,
+    "noImplicitAny": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noImplicitReturns": true,
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["./*"],
+      "@common/*": ["./common/*"],
+      "@modules/*": ["./modules/*"],
+      "@config/*": ["./common/config/*"],
+      "@utils/*": ["./common/utils/*"],
+      "@middleware/*": ["./common/middleware/*"],
+      "@types/*": ["./common/types/*"],
+      "@auth/*": ["./modules/auth/*"],
+      "@roadmap/*": ["./modules/roadmap/*"],
+      "@quiz/*": ["./modules/quiz/*"],
+      "@blog/*": ["./modules/blog/*"]
+    }
+  },
+  "include": ["./**/*"],
+  "exclude": ["node_modules", "dist"]
+}
