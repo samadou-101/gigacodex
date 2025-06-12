@@ -50,6 +50,11 @@ export function Sidebar() {
       icon: Target,
     },
     {
+      title: "Blog",
+      href: "/dashboard/blog",
+      icon: BookOpen,
+    },
+    {
       title: "Ask Guide",
       href: "/dashboard/ask-guide",
       icon: Brain,
