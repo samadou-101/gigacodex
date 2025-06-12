@@ -1,15 +1,14 @@
 "use client";
 import {
-  Home,
-  Map,
-  MessageSquare,
-  TrendingUp,
-  BookOpen,
-  Users,
   Menu,
   X,
+  Map,
+  BookOpen,
   ChevronRight,
   PanelLeftClose,
+  LayoutDashboard,
+  Target,
+  Brain,
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -34,13 +33,32 @@ export function Sidebar() {
     localStorage.setItem("gigacodex-sidebar", JSON.stringify(newState));
   };
 
-  const navItems = [
-    { name: "Home", icon: Home, href: "/dashboard" },
-    { name: "Roadmap", icon: Map, href: "/dashboard/roadmap" },
-    { name: "Ask Guide", icon: MessageSquare, href: "/dashboard/ask-guide" },
-    { name: "Progress", icon: TrendingUp, href: "/dashboard/progress" },
-    { name: "Resources", icon: BookOpen, href: "/dashboard/resources" },
-    { name: "Community", icon: Users, href: "/dashboard/community" },
+  const mainNav = [
+    {
+      title: "Dashboard",
+      href: "/dashboard",
+      icon: LayoutDashboard,
+    },
+    {
+      title: "Roadmap",
+      href: "/dashboard/roadmap",
+      icon: Map,
+    },
+    {
+      title: "Study Plan",
+      href: "/dashboard/plan",
+      icon: Target,
+    },
+    {
+      title: "Ask Guide",
+      href: "/dashboard/ask-guide",
+      icon: Brain,
+    },
+    {
+      title: "Resources",
+      href: "/dashboard/resources",
+      icon: BookOpen,
+    },
   ];
 
   return (
@@ -83,11 +101,11 @@ export function Sidebar() {
             </button>
           </div>
           <nav className="space-y-2">
-            {navItems.map((item) => {
+            {mainNav.map((item) => {
               const isActive = pathname === item.href;
               return (
                 <Link
-                  key={item.name}
+                  key={item.title}
                   href={item.href}
                   className={`w-full flex items-center space-x-3 px-4 py-3 rounded-xl transition-all duration-300 ${
                     isActive
@@ -96,7 +114,7 @@ export function Sidebar() {
                   }`}
                 >
                   <item.icon className="w-5 h-5" />
-                  <span className="font-medium">{item.name}</span>
+                  <span className="font-medium">{item.title}</span>
                 </Link>
               );
             })}

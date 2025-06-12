@@ -1,164 +1,156 @@
 "use client";
+
 import { useState } from "react";
-import { Send, Bot, User } from "lucide-react";
-import { ThemeToggle } from "@/components/ThemeToggle";
+import { Brain, Send, Sparkles, Bot, User, Loader2 } from "lucide-react";
+
+interface Message {
+  id: number;
+  content: string;
+  role: "user" | "assistant";
+  timestamp: Date;
+}
 
 export default function AskGuide() {
-  const [message, setMessage] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
-  const [chatHistory, setChatHistory] = useState([
+  const [messages, setMessages] = useState<Message[]>([
     {
+      id: 1,
+      content:
+        "Hello! I'm your AI Guide. How can I help you with your learning journey today?",
       role: "assistant",
-      content: "Hello! I'm your AI learning guide. How can I help you today?",
+      timestamp: new Date(),
     },
   ]);
+  const [input, setInput] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!message.trim()) return;
+    if (!input.trim()) return;
 
-    // Add user message to chat
-    setChatHistory((prev) => [...prev, { role: "user", content: message }]);
-    setMessage("");
+    // Add user message
+    const userMessage: Message = {
+      id: messages.length + 1,
+      content: input,
+      role: "user",
+      timestamp: new Date(),
+    };
+    setMessages((prev) => [...prev, userMessage]);
+    setInput("");
     setIsLoading(true);
 
-    // Simulate AI response (replace with actual API call)
+    // Simulate AI response
     setTimeout(() => {
-      setChatHistory((prev) => [
-        ...prev,
-        {
-          role: "assistant",
-          content:
-            "I'm here to help you with your learning journey. What specific topic would you like to explore?",
-        },
-      ]);
+      const aiMessage: Message = {
+        id: messages.length + 2,
+        content:
+          "I'm here to help you learn and grow. Let me think about your question...",
+        role: "assistant",
+        timestamp: new Date(),
+      };
+      setMessages((prev) => [...prev, aiMessage]);
       setIsLoading(false);
-    }, 1000);
+    }, 1500);
   };
 
   return (
-    <div className="p-8">
-      <div className="max-w-6xl mx-auto">
-        {/* Header with Theme Toggle */}
-        <div className="flex justify-between items-center mb-8">
+    <div className="h-[calc(100vh-4rem)] flex flex-col">
+      {/* Header */}
+      <div className="bg-white/50 dark:bg-slate-800/50 backdrop-blur-sm border-b border-slate-200 dark:border-slate-700/50 p-4">
+        <div className="flex items-center space-x-3">
+          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-500 to-indigo-500 flex items-center justify-center shadow-lg shadow-purple-500/20">
+            <Brain className="w-6 h-6 text-white" />
+          </div>
           <div>
-            <h1 className="text-3xl font-bold text-slate-900 dark:text-white mb-2">
-              Ask Guide
+            <h1 className="text-xl font-bold text-slate-900 dark:text-white">
+              AI Guide
             </h1>
-            <p className="text-slate-600 dark:text-slate-400">
-              Get personalized guidance from your AI learning companion
+            <p className="text-sm text-slate-600 dark:text-slate-400">
+              Your personalized learning assistant
             </p>
           </div>
-          <ThemeToggle />
         </div>
+      </div>
 
-        {/* Chat Interface */}
-        <div className="bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 shadow-lg">
-          {/* Chat Messages */}
-          <div className="h-[600px] overflow-y-auto p-6 space-y-6">
-            {chatHistory.map((msg, index) => (
+      {/* Chat Area */}
+      <div className="flex-1 overflow-y-auto p-4 space-y-4">
+        {messages.map((message) => (
+          <div
+            key={message.id}
+            className={`flex ${
+              message.role === "user" ? "justify-end" : "justify-start"
+            }`}
+          >
+            <div
+              className={`flex items-start space-x-3 max-w-[80%] ${
+                message.role === "user"
+                  ? "flex-row-reverse space-x-reverse"
+                  : ""
+              }`}
+            >
               <div
-                key={index}
-                className={`flex ${
-                  msg.role === "user" ? "justify-end" : "justify-start"
+                className={`w-8 h-8 rounded-xl flex items-center justify-center flex-shrink-0 ${
+                  message.role === "user"
+                    ? "bg-gradient-to-br from-blue-500 to-indigo-500"
+                    : "bg-gradient-to-br from-purple-500 to-indigo-500"
                 }`}
               >
-                <div
-                  className={`flex items-start space-x-3 max-w-[80%] ${
-                    msg.role === "user"
-                      ? "flex-row-reverse space-x-reverse"
-                      : ""
-                  }`}
-                >
-                  <div
-                    className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 ${
-                      msg.role === "user"
-                        ? "bg-blue-600"
-                        : "bg-gradient-to-br from-blue-600 to-indigo-600"
-                    }`}
-                  >
-                    {msg.role === "user" ? (
-                      <User className="w-5 h-5 text-white" />
-                    ) : (
-                      <Bot className="w-5 h-5 text-white" />
-                    )}
-                  </div>
-                  <div
-                    className={`rounded-2xl px-4 py-2 ${
-                      msg.role === "user"
-                        ? "bg-blue-600 text-white"
-                        : "bg-slate-100 dark:bg-slate-700 text-slate-900 dark:text-white"
-                    }`}
-                  >
-                    {msg.content}
-                  </div>
-                </div>
+                {message.role === "user" ? (
+                  <User className="w-5 h-5 text-white" />
+                ) : (
+                  <Bot className="w-5 h-5 text-white" />
+                )}
               </div>
-            ))}
-            {isLoading && (
-              <div className="flex justify-start">
-                <div className="flex items-start space-x-3 max-w-[80%]">
-                  <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-600 to-indigo-600 flex items-center justify-center flex-shrink-0">
-                    <Bot className="w-5 h-5 text-white" />
-                  </div>
-                  <div className="bg-slate-100 dark:bg-slate-700 rounded-2xl px-4 py-2">
-                    <div className="flex space-x-2">
-                      <div className="w-2 h-2 bg-slate-400 dark:bg-slate-500 rounded-full animate-bounce"></div>
-                      <div className="w-2 h-2 bg-slate-400 dark:bg-slate-500 rounded-full animate-bounce delay-100"></div>
-                      <div className="w-2 h-2 bg-slate-400 dark:bg-slate-500 rounded-full animate-bounce delay-200"></div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            )}
-          </div>
-
-          {/* Input Form */}
-          <form
-            onSubmit={handleSubmit}
-            className="p-4 border-t border-slate-200 dark:border-slate-700"
-          >
-            <div className="flex space-x-4">
-              <input
-                type="text"
-                value={message}
-                onChange={(e) => setMessage(e.target.value)}
-                placeholder="Type your question here..."
-                className="flex-1 bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:text-white"
-              />
-              <button
-                type="submit"
-                disabled={!message.trim() || isLoading}
-                className="px-6 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-xl font-medium hover:from-blue-700 hover:to-indigo-700 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+              <div
+                className={`rounded-2xl px-4 py-3 ${
+                  message.role === "user"
+                    ? "bg-blue-500 text-white"
+                    : "bg-white/50 dark:bg-slate-800/50 backdrop-blur-sm border border-slate-200 dark:border-slate-700/50 text-slate-900 dark:text-white"
+                }`}
               >
-                <Send className="w-5 h-5" />
-              </button>
+                <p className="text-sm">{message.content}</p>
+                <span className="text-xs opacity-70 mt-1 block">
+                  {message.timestamp.toLocaleTimeString()}
+                </span>
+              </div>
             </div>
-          </form>
-        </div>
-
-        {/* Quick Suggestions */}
-        <div className="mt-8">
-          <h2 className="text-lg font-semibold text-slate-900 dark:text-white mb-4">
-            Quick Suggestions
-          </h2>
-          <div className="flex flex-wrap gap-3">
-            {[
-              "How do I start with React?",
-              "What's the best way to learn JavaScript?",
-              "Can you explain async/await?",
-              "How to structure a full-stack project?",
-            ].map((suggestion) => (
-              <button
-                key={suggestion}
-                onClick={() => setMessage(suggestion)}
-                className="px-4 py-2 bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-600 transition-colors duration-300"
-              >
-                {suggestion}
-              </button>
-            ))}
           </div>
-        </div>
+        ))}
+        {isLoading && (
+          <div className="flex justify-start">
+            <div className="flex items-start space-x-3 max-w-[80%]">
+              <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-purple-500 to-indigo-500 flex items-center justify-center">
+                <Bot className="w-5 h-5 text-white" />
+              </div>
+              <div className="bg-white/50 dark:bg-slate-800/50 backdrop-blur-sm border border-slate-200 dark:border-slate-700/50 rounded-2xl px-4 py-3">
+                <Loader2 className="w-5 h-5 text-purple-500 animate-spin" />
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* Input Area */}
+      <div className="bg-white/50 dark:bg-slate-800/50 backdrop-blur-sm border-t border-slate-200 dark:border-slate-700/50 p-4">
+        <form onSubmit={handleSubmit} className="flex space-x-4">
+          <div className="flex-1 relative">
+            <input
+              type="text"
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+              placeholder="Ask your AI guide anything..."
+              className="w-full bg-white/50 dark:bg-slate-700/50 backdrop-blur-sm border border-slate-200 dark:border-slate-600/50 rounded-xl py-3 px-4 pr-12 text-slate-900 dark:text-white placeholder-slate-500 dark:placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-purple-500/50 dark:focus:ring-purple-400/50"
+            />
+            <Sparkles className="w-5 h-5 text-purple-500 absolute right-4 top-1/2 transform -translate-y-1/2" />
+          </div>
+          <button
+            type="submit"
+            disabled={!input.trim() || isLoading}
+            className="bg-gradient-to-r from-purple-500 to-indigo-500 text-white rounded-xl px-6 py-3 font-medium hover:from-purple-600 hover:to-indigo-600 focus:outline-none focus:ring-2 focus:ring-purple-500/50 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300 flex items-center space-x-2"
+          >
+            <Send className="w-5 h-5" />
+            <span>Send</span>
+          </button>
+        </form>
       </div>
     </div>
   );
