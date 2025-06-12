@@ -1,10 +1,10 @@
 # Details
 
-Date : 2025-06-12 16:54:32
+Date : 2025-06-12 18:32:23
 
 Directory c:\\Users\\Abdessamed\\Desktop\\GigaCodeX\\frontend
 
-Total : 21 files,  1624 codes, 72 comments, 140 blanks, all 1836 lines
+Total : 28 files,  2802 codes, 111 comments, 205 blanks, all 3118 lines
 
 [Summary](results.md) / Details / [Diff Summary](diff.md) / [Diff Details](diff-details.md)
 
@@ -21,12 +21,19 @@ Total : 21 files,  1624 codes, 72 comments, 140 blanks, all 1836 lines
 | [public/next.svg](/public/next.svg) | XML | 1 | 0 | 0 | 1 |
 | [public/vercel.svg](/public/vercel.svg) | XML | 1 | 0 | 0 | 1 |
 | [public/window.svg](/public/window.svg) | XML | 1 | 0 | 0 | 1 |
-| [src/app/dashboard/page.tsx](/src/app/dashboard/page.tsx) | TypeScript JSX | 217 | 8 | 9 | 234 |
-| [src/app/get-started/assessment/page.tsx](/src/app/get-started/assessment/page.tsx) | TypeScript JSX | 383 | 12 | 21 | 416 |
-| [src/app/get-started/page.tsx](/src/app/get-started/page.tsx) | TypeScript JSX | 97 | 5 | 6 | 108 |
+| [src/app/dashboard/ask-guide/page.tsx](/src/app/dashboard/ask-guide/page.tsx) | TypeScript JSX | 150 | 7 | 9 | 166 |
+| [src/app/dashboard/community/page.tsx](/src/app/dashboard/community/page.tsx) | TypeScript JSX | 207 | 4 | 11 | 222 |
+| [src/app/dashboard/layout.tsx](/src/app/dashboard/layout.tsx) | TypeScript JSX | 93 | 4 | 7 | 104 |
+| [src/app/dashboard/page.tsx](/src/app/dashboard/page.tsx) | TypeScript JSX | 211 | 8 | 10 | 229 |
+| [src/app/dashboard/progress/page.tsx](/src/app/dashboard/progress/page.tsx) | TypeScript JSX | 211 | 5 | 9 | 225 |
+| [src/app/dashboard/resources/page.tsx](/src/app/dashboard/resources/page.tsx) | TypeScript JSX | 157 | 4 | 8 | 169 |
+| [src/app/dashboard/roadmap/page.tsx](/src/app/dashboard/roadmap/page.tsx) | TypeScript JSX | 127 | 2 | 6 | 135 |
+| [src/app/get-started/assessment/page.tsx](/src/app/get-started/assessment/page.tsx) | TypeScript JSX | 385 | 12 | 21 | 418 |
+| [src/app/get-started/assessment/results/page.tsx](/src/app/get-started/assessment/results/page.tsx) | TypeScript JSX | 235 | 11 | 13 | 259 |
+| [src/app/get-started/page.tsx](/src/app/get-started/page.tsx) | TypeScript JSX | 101 | 5 | 8 | 114 |
 | [src/app/globals.css](/src/app/globals.css) | CSS | 15 | 10 | 6 | 31 |
 | [src/app/layout.tsx](/src/app/layout.tsx) | TypeScript JSX | 31 | 0 | 5 | 36 |
-| [src/app/page.tsx](/src/app/page.tsx) | TypeScript JSX | 531 | 25 | 32 | 588 |
+| [src/app/page.tsx](/src/app/page.tsx) | TypeScript JSX | 529 | 27 | 31 | 587 |
 | [src/components/MobileMenu.tsx](/src/components/MobileMenu.tsx) | TypeScript JSX | 46 | 1 | 5 | 52 |
 | [src/components/ThemeProvider.tsx](/src/components/ThemeProvider.tsx) | TypeScript JSX | 14 | 0 | 3 | 17 |
 | [src/components/ThemeToggle.tsx](/src/components/ThemeToggle.tsx) | TypeScript JSX | 15 | 0 | 4 | 19 |
