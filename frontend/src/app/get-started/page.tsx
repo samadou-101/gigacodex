@@ -7,10 +7,16 @@ import {
   Sparkles,
   Play,
 } from "lucide-react";
-import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { ThemeToggle } from "@/components/ThemeToggle";
 
 export default function GetStarted() {
+  const router = useRouter();
+
+  const handleAssessmentClick = () => {
+    router.push("/get-started/assessment");
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-blue-50/30 dark:from-slate-950 dark:via-slate-900 dark:to-blue-950/30">
       {/* Theme Toggle */}
@@ -46,8 +52,8 @@ export default function GetStarted() {
 
             {/* CTA Buttons */}
             <div className="flex flex-col sm:flex-row gap-6 justify-center items-center mb-16">
-              <Link
-                href="/get-started/assessment"
+              <button
+                onClick={handleAssessmentClick}
                 className="group relative px-8 py-4 bg-gradient-to-r from-blue-600 to-blue-800 hover:from-blue-700 hover:to-blue-900 text-white rounded-2xl font-semibold text-lg transition-all duration-300 hover:scale-105 shadow-xl shadow-blue-500/25 hover:shadow-2xl hover:shadow-blue-500/40 overflow-hidden"
               >
                 <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/20 to-white/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000 opacity-50 dark:opacity-20"></div>
@@ -56,7 +62,7 @@ export default function GetStarted() {
                   Take Your Assessment
                   <ArrowRight className="ml-3 h-5 w-5 group-hover:translate-x-1 transition-transform duration-300" />
                 </div>
-              </Link>
+              </button>
             </div>
           </div>
 

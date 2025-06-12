@@ -1,5 +1,6 @@
 "use client";
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import {
   ArrowRight,
   ArrowLeft,
@@ -146,6 +147,7 @@ const questions: Question[] = [
 ];
 
 export default function Assessment() {
+  const router = useRouter();
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [answers, setAnswers] = useState<Record<number, string[]>>({});
   const [selectedOptions, setSelectedOptions] = useState<string[]>([]);
@@ -182,8 +184,8 @@ export default function Assessment() {
     // Here you would typically send the answers to your backend
     console.log("Final answers:", answers);
     console.log("Additional input:", additionalInput);
-    // Navigate to results page
-    window.location.href = "/get-started/results";
+    // Navigate to results page using Next.js router
+    router.push("/get-started/results");
   };
 
   const progress = ((currentQuestion + 1) / questions.length) * 100;
