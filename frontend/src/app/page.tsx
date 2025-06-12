@@ -50,14 +50,14 @@ export default function ModernGigaCodeX() {
             <nav className="hidden lg:flex items-center space-x-8">
               {["Features", "How It Works", "Community", "Get Started"].map(
                 (item) => (
-                  <a
+                  <Link
                     key={item}
-                    href="#"
+                    href={item === "How It Works" ? "/how-it-works" : "#"}
                     className="text-slate-700 dark:text-slate-300 hover:text-blue-600 dark:hover:text-blue-400 transition-all duration-300 font-medium relative group px-3 py-2 rounded-lg hover:bg-blue-50 dark:hover:bg-blue-950/50"
                   >
                     {item}
                     <span className="absolute inset-x-0 -bottom-1 h-0.5 bg-blue-600 dark:bg-blue-400 scale-x-0 group-hover:scale-x-100 transition-transform duration-300 rounded-full"></span>
-                  </a>
+                  </Link>
                 )
               )}
 
@@ -130,12 +130,15 @@ export default function ModernGigaCodeX() {
               </div>
             </Link>
 
-            <button className="group px-8 py-4 bg-white/50 dark:bg-slate-800/50 hover:bg-white/80 dark:hover:bg-slate-800/80 backdrop-blur-sm border-2 border-slate-200 dark:border-slate-700 hover:border-blue-300 dark:hover:border-blue-600 text-slate-700 dark:text-slate-300 hover:text-blue-600 dark:hover:text-blue-400 rounded-2xl font-semibold text-lg transition-all duration-300 hover:scale-105 shadow-lg hover:shadow-xl">
+            <Link
+              href="/how-it-works"
+              className="group px-8 py-4 bg-white/50 dark:bg-slate-800/50 hover:bg-white/80 dark:hover:bg-slate-800/80 backdrop-blur-sm border-2 border-slate-200 dark:border-slate-700 hover:border-blue-300 dark:hover:border-blue-600 text-slate-700 dark:text-slate-300 hover:text-blue-600 dark:hover:text-blue-400 rounded-2xl font-semibold text-lg transition-all duration-300 hover:scale-105 shadow-lg hover:shadow-xl"
+            >
               <div className="flex items-center">
                 See How It Works
                 <ChevronRight className="ml-3 h-5 w-5 group-hover:translate-x-1 transition-transform duration-300" />
               </div>
-            </button>
+            </Link>
           </div>
         </div>
       </section>

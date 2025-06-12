@@ -29,7 +29,7 @@ export default function RootLayout({
                   document.documentElement.classList.remove('dark');
                 }
               } catch (_) {}
-            `,
+            // `,
           }}
         />
       </head>
