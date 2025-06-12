@@ -64,9 +64,12 @@ export default function ModernGigaCodeX() {
               <ThemeToggle />
 
               <div className="flex items-center space-x-3">
-                <button className="px-4 py-2 text-slate-700 dark:text-slate-300 hover:text-blue-600 dark:hover:text-blue-400 font-medium transition-colors duration-300">
+                <Link
+                  href="/auth/login"
+                  className="px-4 py-2 text-slate-700 dark:text-slate-300 hover:text-blue-600 dark:hover:text-blue-400 font-medium transition-colors duration-300"
+                >
                   Sign In
-                </button>
+                </Link>
                 <button className="px-6 py-2.5 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white rounded-xl font-medium transition-all duration-300 hover:scale-105 shadow-lg shadow-blue-500/25 hover:shadow-xl hover:shadow-blue-500/30">
                   Start Learning
                 </button>

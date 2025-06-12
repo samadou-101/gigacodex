@@ -3,6 +3,7 @@
 import { Menu, X } from "lucide-react";
 import { useState } from "react";
 import { ThemeToggle } from "./ThemeToggle";
+import Link from "next/link";
 
 export function MobileMenu() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -38,10 +39,19 @@ export function MobileMenu() {
                 </a>
               )
             )}
-            <div className="border-t border-slate-200 dark:border-slate-800 pt-3 mt-3">
-              <button className="w-full px-4 py-3 bg-gradient-to-r from-blue-600 to-blue-800 text-white rounded-xl font-medium transition-all duration-300 hover:scale-105">
+            <div className="border-t border-slate-200 dark:border-slate-800 pt-3 mt-3 space-y-3">
+              <Link
+                href="/auth/login"
+                className="block px-4 py-3 text-slate-700 dark:text-slate-300 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-950/50 rounded-xl transition-all duration-300 font-medium"
+              >
+                Sign In
+              </Link>
+              <Link
+                href="/get-started"
+                className="block w-full px-4 py-3 bg-gradient-to-r from-blue-600 to-blue-800 text-white rounded-xl font-medium transition-all duration-300 hover:scale-105 text-center"
+              >
                 Find Your Path Now
-              </button>
+              </Link>
             </div>
           </div>
         </div>
