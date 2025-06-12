@@ -447,15 +447,18 @@ export default function ModernGigaCodeX() {
           <div className="flex flex-col sm:flex-row gap-6 justify-center mb-12">
             <button className="group relative px-10 py-5 bg-white text-blue-600 hover:text-blue-700 rounded-2xl font-bold text-lg transition-all duration-300 hover:scale-105 shadow-xl hover:shadow-2xl overflow-hidden">
               <div className="absolute inset-0 bg-gradient-to-r from-transparent via-blue-50 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000"></div>
-              <div className="relative flex items-center justify-center">
+              <Link
+                href={"/get-started"}
+                className="relative flex items-center justify-center"
+              >
                 Start Your Journey
                 <ArrowUpRight className="ml-3 h-6 w-6 group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform duration-300" />
-              </div>
+              </Link>
             </button>
 
-            <button className="px-10 py-5 border-2 border-white/30 text-white hover:bg-white/10 rounded-2xl font-bold text-lg transition-all duration-300 hover:scale-105 backdrop-blur-sm">
+            {/* <button className="px-10 py-5 border-2 border-white/30 text-white hover:bg-white/10 rounded-2xl font-bold text-lg transition-all duration-300 hover:scale-105 backdrop-blur-sm">
               Schedule Demo
-            </button>
+            </button> */}
           </div>
 
           <div className="text-center text-white/70 text-sm">

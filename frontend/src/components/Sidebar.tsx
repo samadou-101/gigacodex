@@ -13,14 +13,26 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useDispatch, useSelector } from "react-redux";
-import { RootState } from "@/store/store";
-import { toggleSidebar } from "@/store/sidebarSlice";
+import { useEffect, useState } from "react";
 
 export function Sidebar() {
-  const dispatch = useDispatch();
-  const isSidebarOpen = useSelector((state: RootState) => state.sidebar.isOpen);
+  const [isOpen, setIsOpen] = useState(true);
   const pathname = usePathname();
+
+  // Initialize state from localStorage on mount
+  useEffect(() => {
+    const savedState = localStorage.getItem("gigacodex-sidebar");
+    if (savedState) {
+      setIsOpen(JSON.parse(savedState));
+    }
+  }, []);
+
+  // Save state to localStorage when it changes
+  const toggleSidebar = () => {
+    const newState = !isOpen;
+    setIsOpen(newState);
+    localStorage.setItem("gigacodex-sidebar", JSON.stringify(newState));
+  };
 
   const navItems = [
     { name: "Home", icon: Home, href: "/dashboard" },
@@ -35,10 +47,10 @@ export function Sidebar() {
     <>
       {/* Mobile Menu Button */}
       <button
-        onClick={() => dispatch(toggleSidebar())}
+        onClick={toggleSidebar}
         className="fixed top-4 left-4 z-50 lg:hidden bg-white/90 dark:bg-slate-800/80 backdrop-blur-sm p-2 rounded-xl shadow-lg border border-slate-200 dark:border-slate-700/50 hover:scale-105 transition-all duration-300"
       >
-        {isSidebarOpen ? (
+        {isOpen ? (
           <X className="w-6 h-6 text-slate-700 dark:text-slate-400" />
         ) : (
           <Menu className="w-6 h-6 text-slate-700 dark:text-slate-400" />
@@ -48,7 +60,7 @@ export function Sidebar() {
       {/* Sidebar */}
       <aside
         className={`fixed top-0 left-0 h-full w-64 bg-white/90 dark:bg-slate-900/80 backdrop-blur-sm border-r border-slate-200 dark:border-slate-800/50 transition-transform duration-300 z-40 ${
-          isSidebarOpen ? "translate-x-0" : "-translate-x-full"
+          isOpen ? "translate-x-0" : "-translate-x-full"
         }`}
       >
         <div className="p-6">
@@ -63,7 +75,7 @@ export function Sidebar() {
             </div>
             {/* Desktop Toggle Button - ChatGPT Style */}
             <button
-              onClick={() => dispatch(toggleSidebar())}
+              onClick={toggleSidebar}
               className="hidden lg:flex items-center justify-center w-8 h-8 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-all duration-300"
               title="Toggle Sidebar"
             >
@@ -93,9 +105,9 @@ export function Sidebar() {
       </aside>
 
       {/* Show Sidebar Button when closed */}
-      {!isSidebarOpen && (
+      {!isOpen && (
         <button
-          onClick={() => dispatch(toggleSidebar())}
+          onClick={toggleSidebar}
           className="fixed top-4 left-4 z-50 hidden lg:flex items-center justify-center w-8 h-8 bg-white/90 dark:bg-slate-800/80 backdrop-blur-sm rounded-xl shadow-lg border border-slate-200 dark:border-slate-700/50 hover:scale-105 transition-all duration-300"
         >
           <ChevronRight className="w-5 h-5 text-slate-700 dark:text-slate-400" />
@@ -103,18 +115,16 @@ export function Sidebar() {
       )}
 
       {/* Overlay for mobile */}
-      {isSidebarOpen && (
+      {isOpen && (
         <div
           className="fixed inset-0 bg-black/20 backdrop-blur-sm z-30 lg:hidden"
-          onClick={() => dispatch(toggleSidebar())}
+          onClick={toggleSidebar}
         />
       )}
 
       {/* Main Content Wrapper */}
       <div
-        className={`transition-all duration-300 ${
-          isSidebarOpen ? "lg:ml-64" : ""
-        }`}
+        className={`transition-all duration-300 ${isOpen ? "lg:ml-64" : ""}`}
       />
     </>
   );
