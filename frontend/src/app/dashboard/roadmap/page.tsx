@@ -18,7 +18,6 @@ import { CustomEdge } from "./components/CustomEdge";
 import { Toolbar } from "./components/Toolbar";
 import { NodeEditor } from "./components/NodeEditor";
 import { AIAssistant } from "./components/AIAssistant";
-import { Info } from "lucide-react";
 
 interface CustomNodeData {
   label: string;
@@ -136,7 +135,6 @@ export default function Roadmap() {
     null
   );
   const [showMiniMap, setShowMiniMap] = useState(true);
-  const [showTooltip, setShowTooltip] = useState(true);
   const reactFlowWrapper = useRef<HTMLDivElement>(null);
 
   // Update node numbers whenever nodes or edges change
@@ -300,33 +298,6 @@ export default function Roadmap() {
       <div className="fixed top-4 right-4 z-50">
         <ThemeToggle />
       </div>
-
-      {/* Tooltip */}
-      {showTooltip && (
-        <div className="fixed top-20 right-4 z-50 bg-white dark:bg-slate-800 p-4 rounded-lg shadow-lg border border-slate-200 dark:border-slate-700 max-w-sm">
-          <div className="flex items-start space-x-3">
-            <Info className="w-5 h-5 text-blue-500 mt-0.5" />
-            <div>
-              <h3 className="font-semibold text-slate-900 dark:text-white mb-2">
-                How to Add Nodes
-              </h3>
-              <ul className="text-sm text-slate-600 dark:text-slate-400 space-y-2">
-                <li>• Click the + button between nodes to add a new step</li>
-                <li>
-                  • Drag from one node&apos;s handle to another to connect them
-                </li>
-                <li>• Click the + button in the toolbar to add a new node</li>
-              </ul>
-              <button
-                onClick={() => setShowTooltip(false)}
-                className="mt-3 text-sm text-blue-500 hover:text-blue-600 dark:text-blue-400 dark:hover:text-blue-300"
-              >
-                Got it!
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
 
       {/* ReactFlow Canvas */}
       <div className="h-full w-full" ref={reactFlowWrapper}>
