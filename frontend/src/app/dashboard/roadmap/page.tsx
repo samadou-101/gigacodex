@@ -4,18 +4,19 @@ import ReactFlow, {
   Background,
   Controls,
   MiniMap,
-  Panel,
   useNodesState,
   useEdgesState,
   addEdge,
-  NodeProps,
   Connection,
   Edge,
   Node,
 } from "reactflow";
 import "reactflow/dist/style.css";
 import { ThemeToggle } from "@/components/ThemeToggle";
-import { Plus, Save, Trash2, Code2, Brain, Map } from "lucide-react";
+import { CustomNode } from "./components/CustomNode";
+import { Toolbar } from "./components/Toolbar";
+import { NodeEditor } from "./components/NodeEditor";
+import { AIAssistant } from "./components/AIAssistant";
 
 interface CustomNodeData {
   label: string;
@@ -23,33 +24,6 @@ interface CustomNodeData {
   tag?: string;
   link?: string;
 }
-
-// Custom node types
-const CustomNode = ({ data, selected }: NodeProps) => {
-  return (
-    <div
-      className={`p-2 rounded-lg border-2 shadow-lg transition-all duration-300 ${
-        selected
-          ? "border-blue-500 bg-blue-50 dark:bg-blue-950/50"
-          : "border-slate-200 dark:border-slate-700 bg-white/90 dark:bg-slate-800/90"
-      }`}
-    >
-      <div className="flex items-center space-x-2">
-        <div className="w-6 h-6 rounded-lg bg-gradient-to-br from-blue-500 to-indigo-500 flex items-center justify-center">
-          <Code2 className="w-4 h-4 text-white" />
-        </div>
-        <div>
-          <h3 className="text-sm font-semibold text-slate-900 dark:text-white">
-            {data.label}
-          </h3>
-          <p className="text-xs text-slate-600 dark:text-slate-400">
-            {data.description}
-          </p>
-        </div>
-      </div>
-    </div>
-  );
-};
 
 const nodeTypes = {
   custom: CustomNode,
@@ -162,6 +136,22 @@ export default function Roadmap() {
     }
   }, [setNodes, setEdges]);
 
+  const updateNode = useCallback(
+    (nodeId: string, data: Partial<CustomNodeData>) => {
+      setNodes((nds) =>
+        nds.map((node) =>
+          node.id === nodeId
+            ? {
+                ...node,
+                data: { ...node.data, ...data },
+              }
+            : node
+        )
+      );
+    },
+    [setNodes]
+  );
+
   return (
     <div className="h-[calc(100vh-3rem)] w-full bg-gradient-to-br from-slate-50 via-white to-blue-50/30 dark:from-slate-950 dark:via-slate-900 dark:to-blue-950/30">
       {/* Theme Toggle */}
@@ -191,191 +181,24 @@ export default function Roadmap() {
           <Controls />
           {showMiniMap && <MiniMap />}
 
-          {/* Toolbar */}
-          <Panel
-            position="top-left"
-            className="bg-white/90 dark:bg-slate-800/90 backdrop-blur-sm rounded-xl border border-slate-200 dark:border-slate-700 p-2 shadow-lg"
-          >
-            <div className="flex items-center space-x-2">
-              <button
-                onClick={addNewNode}
-                className="p-2 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg transition-colors"
-                title="Add Node"
-              >
-                <Plus className="w-5 h-5 text-slate-600 dark:text-slate-400" />
-              </button>
-              <button
-                onClick={deleteSelectedNodes}
-                className="p-2 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg transition-colors"
-                title="Delete Selected"
-              >
-                <Trash2 className="w-5 h-5 text-slate-600 dark:text-slate-400" />
-              </button>
-              <button
-                onClick={saveRoadmap}
-                className="p-2 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg transition-colors"
-                title="Save Roadmap"
-              >
-                <Save className="w-5 h-5 text-slate-600 dark:text-slate-400" />
-              </button>
-              <button
-                onClick={loadRoadmap}
-                className="p-2 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg transition-colors"
-                title="Load Roadmap"
-              >
-                <Save className="w-5 h-5 text-slate-600 dark:text-slate-400" />
-              </button>
-              <button
-                onClick={() => setShowMiniMap(!showMiniMap)}
-                className="p-2 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg transition-colors"
-                title={showMiniMap ? "Hide MiniMap" : "Show MiniMap"}
-              >
-                <Map className="w-5 h-5 text-slate-600 dark:text-slate-400" />
-              </button>
-            </div>
-          </Panel>
+          <Toolbar
+            onAddNode={addNewNode}
+            onDeleteSelected={deleteSelectedNodes}
+            onSave={saveRoadmap}
+            onLoad={loadRoadmap}
+            showMiniMap={showMiniMap}
+            onToggleMiniMap={() => setShowMiniMap(!showMiniMap)}
+          />
 
-          {/* Node Editor Panel */}
           {selectedNode && (
-            <Panel
-              position="top-right"
-              className="bg-white/90 dark:bg-slate-800/90 backdrop-blur-sm rounded-xl border border-slate-200 dark:border-slate-700 p-4 shadow-lg w-80"
-            >
-              <div className="space-y-4">
-                <h3 className="font-semibold text-slate-900 dark:text-white">
-                  Edit Node
-                </h3>
-                <div className="space-y-2">
-                  <label className="block text-sm font-medium text-slate-700 dark:text-slate-300">
-                    Title
-                  </label>
-                  <input
-                    type="text"
-                    value={selectedNode.data.label}
-                    onChange={(e) =>
-                      setNodes((nds) =>
-                        nds.map((node) =>
-                          node.id === selectedNode.id
-                            ? {
-                                ...node,
-                                data: { ...node.data, label: e.target.value },
-                              }
-                            : node
-                        )
-                      )
-                    }
-                    className="w-full px-3 py-2 bg-white dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-lg text-slate-900 dark:text-white"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <label className="block text-sm font-medium text-slate-700 dark:text-slate-300">
-                    Description
-                  </label>
-                  <textarea
-                    value={selectedNode.data.description}
-                    onChange={(e) =>
-                      setNodes((nds) =>
-                        nds.map((node) =>
-                          node.id === selectedNode.id
-                            ? {
-                                ...node,
-                                data: {
-                                  ...node.data,
-                                  description: e.target.value,
-                                },
-                              }
-                            : node
-                        )
-                      )
-                    }
-                    className="w-full px-3 py-2 bg-white dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-lg text-slate-900 dark:text-white"
-                    rows={3}
-                  />
-                </div>
-                <div className="space-y-2">
-                  <label className="block text-sm font-medium text-slate-700 dark:text-slate-300">
-                    Tag
-                  </label>
-                  <input
-                    type="text"
-                    value={selectedNode.data.tag}
-                    onChange={(e) =>
-                      setNodes((nds) =>
-                        nds.map((node) =>
-                          node.id === selectedNode.id
-                            ? {
-                                ...node,
-                                data: { ...node.data, tag: e.target.value },
-                              }
-                            : node
-                        )
-                      )
-                    }
-                    className="w-full px-3 py-2 bg-white dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-lg text-slate-900 dark:text-white"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <label className="block text-sm font-medium text-slate-700 dark:text-slate-300">
-                    Resource Link
-                  </label>
-                  <input
-                    type="url"
-                    value={selectedNode.data.link || ""}
-                    onChange={(e) =>
-                      setNodes((nds) =>
-                        nds.map((node) =>
-                          node.id === selectedNode.id
-                            ? {
-                                ...node,
-                                data: { ...node.data, link: e.target.value },
-                              }
-                            : node
-                        )
-                      )
-                    }
-                    className="w-full px-3 py-2 bg-white dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-lg text-slate-900 dark:text-white"
-                    placeholder="https://..."
-                  />
-                </div>
-                <button
-                  onClick={() => setSelectedNode(null)}
-                  className="w-full px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors"
-                >
-                  Done
-                </button>
-              </div>
-            </Panel>
+            <NodeEditor
+              node={selectedNode}
+              onUpdate={updateNode}
+              onClose={() => setSelectedNode(null)}
+            />
           )}
 
-          {/* AI Assistant Panel */}
-          {selectedNode && (
-            <Panel
-              position="bottom-right"
-              className="bg-white/90 dark:bg-slate-800/90 backdrop-blur-sm rounded-xl border border-slate-200 dark:border-slate-700 p-4 shadow-lg w-80"
-            >
-              <div className="space-y-4">
-                <div className="flex items-center space-x-2">
-                  <Brain className="w-5 h-5 text-blue-600 dark:text-blue-400" />
-                  <h3 className="font-semibold text-slate-900 dark:text-white">
-                    AI Assistant
-                  </h3>
-                </div>
-                <p className="text-sm text-slate-600 dark:text-slate-400">
-                  Ask AI about this learning step
-                </p>
-                <div className="space-y-2">
-                  <textarea
-                    className="w-full px-3 py-2 bg-white dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-lg text-slate-900 dark:text-white"
-                    rows={3}
-                    placeholder="Ask anything about this topic..."
-                  />
-                  <button className="w-full px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors">
-                    Ask AI
-                  </button>
-                </div>
-              </div>
-            </Panel>
-          )}
+          {selectedNode && <AIAssistant />}
         </ReactFlow>
       </div>
     </div>
