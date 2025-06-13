@@ -38,7 +38,7 @@ export default function ModernGigaCodeX() {
               </div>
               <div>
                 <span className="text-2xl font-bold bg-gradient-to-r from-slate-900 via-blue-900 to-indigo-900 dark:from-white dark:via-blue-100 dark:to-purple-100 bg-clip-text text-transparent">
-                  gigaCodeX
+                  GigaCodeX
                 </span>
                 <div className="text-xs text-slate-500 dark:text-slate-400 font-medium">
                   Learning Companion
@@ -115,7 +115,7 @@ export default function ModernGigaCodeX() {
           <p className="text-xl md:text-2xl text-slate-600 dark:text-slate-300 mb-12 max-w-4xl mx-auto leading-relaxed font-medium">
             You&apos;re smart. You&apos;re motivated. But you&apos;re stuck in
             tutorial hell, jumping from course to course without real progress.
-            gigaCodeX is your escape route—a learning compass that transforms
+            GigaCodeX is your escape route—a learning compass that transforms
             confusion into confidence.
           </p>
 
@@ -157,7 +157,7 @@ export default function ModernGigaCodeX() {
           <div className="text-center mb-20">
             <div className="inline-flex items-center px-4 py-2 bg-blue-100 dark:bg-blue-950/50 rounded-full text-blue-700 dark:text-blue-400 font-semibold text-sm mb-6">
               <Zap className="w-4 h-4 mr-2" />
-              Why gigaCodeX is Different
+              Why GigaCodeX is Different
             </div>
             <h2 className="text-4xl md:text-5xl font-bold mb-6 text-slate-900 dark:text-white">
               Beyond Traditional Learning
@@ -491,7 +491,7 @@ export default function ModernGigaCodeX() {
                 </div>
                 <div>
                   <span className="text-2xl font-bold text-slate-900 dark:text-white">
-                    gigaCodeX
+                    GigaCodeX
                   </span>
                   <div className="text-sm text-slate-500 dark:text-slate-400">
                     Learning Companion
@@ -564,7 +564,7 @@ export default function ModernGigaCodeX() {
           <div className="border-t border-slate-200 dark:border-slate-800 pt-8">
             <div className="flex flex-col md:flex-row justify-between items-center">
               <p className="text-slate-600 dark:text-slate-400 text-sm mb-4 md:mb-0">
-                © 2024 gigaCodeX. All rights reserved.
+                © 2024 GigaCodeX. All rights reserved.
               </p>
               <div className="flex space-x-6">
                 <a

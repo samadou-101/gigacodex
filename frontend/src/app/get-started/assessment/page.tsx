@@ -185,7 +185,7 @@ export default function Assessment() {
     console.log("Final answers:", answers);
     console.log("Additional input:", additionalInput);
     // Navigate to results page using Next.js router
-    router.push("/get-started/results");
+    router.push("/get-started/assessment/results");
   };
 
   const progress = ((currentQuestion + 1) / questions.length) * 100;

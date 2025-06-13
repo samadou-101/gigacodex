@@ -14,7 +14,7 @@ export default function HowItWorks() {
           <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6 text-slate-900 dark:text-white">
             How{" "}
             <span className="bg-gradient-to-r from-blue-600 via-blue-700 to-blue-800 bg-clip-text text-transparent">
-              gigaCodeX
+              GigaCodeX
             </span>{" "}
             Works
           </h1>
