@@ -3,20 +3,20 @@ import {
   BookOpen,
   Map,
   Users,
-  Target,
   Brain,
-  HelpCircle,
   ArrowRight,
-  Sparkles,
-  Clock,
+  Bookmark,
+  MessageSquare,
+  TrendingUp,
+  Search,
 } from "lucide-react";
 import Link from "next/link";
 import { ThemeToggle } from "@/components/ThemeToggle";
 
 export default function Dashboard() {
   return (
-    <div className="p-8">
-      <div className="max-w-6xl mx-auto">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-blue-50/30 dark:from-slate-950 dark:via-slate-900 dark:to-blue-950/30 p-8">
+      <div className="max-w-7xl mx-auto">
         {/* Welcome Section */}
         <div className="mb-8">
           <div className="flex items-center justify-between">
@@ -25,54 +25,48 @@ export default function Dashboard() {
                 Welcome back!
               </h1>
               <p className="text-slate-600 dark:text-slate-400">
-                Ready to continue your learning journey?
+                Your self-learning journey continues
               </p>
             </div>
             <div className="flex items-center space-x-4">
-              <div className="flex items-center px-4 py-2 bg-slate-100 dark:bg-slate-800 rounded-xl">
-                <Clock className="w-4 h-4 text-slate-600 dark:text-slate-400 mr-2" />
-                <span className="text-sm text-slate-600 dark:text-slate-400">
-                  Last active: 2h ago
-                </span>
-              </div>
               <ThemeToggle />
             </div>
           </div>
         </div>
 
-        {/* Core Actions Grid */}
+        {/* Main Features Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-          {/* Build/Update Roadmap */}
+          {/* Blog & Articles */}
           <Link
-            href="/dashboard/roadmap"
+            href="/dashboard/blog"
             className="group relative bg-white/90 dark:bg-slate-800/60 backdrop-blur-sm rounded-2xl border border-slate-200 dark:border-slate-700/50 p-6 hover:border-blue-300 dark:hover:border-blue-600 transition-all duration-300 cursor-pointer hover:scale-105 hover:shadow-xl hover:shadow-slate-200/20 dark:hover:shadow-slate-800/20 overflow-hidden"
           >
             <div className="absolute inset-0 bg-gradient-to-br from-purple-500/5 via-transparent to-pink-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
             <div className="relative">
               <div className="flex items-start justify-between mb-4">
                 <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-purple-500 via-purple-600 to-pink-500 flex items-center justify-center group-hover:scale-110 transition-transform duration-300 shadow-lg">
-                  <Map className="w-6 h-6 text-white" />
+                  <BookOpen className="w-6 h-6 text-white" />
                 </div>
                 <div className="flex items-center space-x-2">
                   <span className="text-xs bg-purple-100 dark:bg-purple-900/30 text-purple-600 dark:text-purple-400 px-2 py-1 rounded-full">
-                    Customizable
+                    New
                   </span>
                 </div>
               </div>
               <h3 className="text-lg font-semibold text-slate-800 dark:text-white mb-2">
-                Build Your Roadmap
+                Learning Blog
               </h3>
               <p className="text-sm text-slate-600 dark:text-slate-400 mb-4">
-                Create or update your personalized learning path
+                Discover curated articles and learning resources
               </p>
               <div className="flex items-center text-blue-600 dark:text-blue-400 text-sm font-medium">
-                Get Started
+                Read Articles
                 <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform duration-300" />
               </div>
             </div>
           </Link>
 
-          {/* Ask AI */}
+          {/* AI Guide */}
           <Link
             href="/dashboard/ask-guide"
             className="group relative bg-white/90 dark:bg-slate-800/60 backdrop-blur-sm rounded-2xl border border-slate-200 dark:border-slate-700/50 p-6 hover:border-blue-300 dark:hover:border-blue-600 transition-all duration-300 cursor-pointer hover:scale-105 hover:shadow-xl hover:shadow-slate-200/20 dark:hover:shadow-slate-800/20 overflow-hidden"
@@ -93,7 +87,7 @@ export default function Dashboard() {
                 Ask AI Guide
               </h3>
               <p className="text-sm text-slate-600 dark:text-slate-400 mb-4">
-                Get personalized guidance and answers
+                Get personalized guidance and answers to your questions
               </p>
               <div className="flex items-center text-blue-600 dark:text-blue-400 text-sm font-medium">
                 Start Chat
@@ -102,61 +96,61 @@ export default function Dashboard() {
             </div>
           </Link>
 
-          {/* Find Resources */}
+          {/* Roadmap */}
           <Link
-            href="/dashboard/resources"
+            href="/dashboard/roadmap"
             className="group relative bg-white/90 dark:bg-slate-800/60 backdrop-blur-sm rounded-2xl border border-slate-200 dark:border-slate-700/50 p-6 hover:border-blue-300 dark:hover:border-blue-600 transition-all duration-300 cursor-pointer hover:scale-105 hover:shadow-xl hover:shadow-slate-200/20 dark:hover:shadow-slate-800/20 overflow-hidden"
           >
             <div className="absolute inset-0 bg-gradient-to-br from-green-500/5 via-transparent to-teal-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
             <div className="relative">
               <div className="flex items-start justify-between mb-4">
                 <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-green-500 via-emerald-500 to-teal-500 flex items-center justify-center group-hover:scale-110 transition-transform duration-300 shadow-lg">
-                  <BookOpen className="w-6 h-6 text-white" />
+                  <Map className="w-6 h-6 text-white" />
                 </div>
                 <div className="flex items-center space-x-2">
                   <span className="text-xs bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400 px-2 py-1 rounded-full">
-                    Curated
+                    Customizable
                   </span>
                 </div>
               </div>
               <h3 className="text-lg font-semibold text-slate-800 dark:text-white mb-2">
-                Find Resources
+                Your Roadmap
               </h3>
               <p className="text-sm text-slate-600 dark:text-slate-400 mb-4">
-                Discover learning materials and tools
+                Update and customize your learning path
               </p>
               <div className="flex items-center text-blue-600 dark:text-blue-400 text-sm font-medium">
-                Browse Resources
+                View Roadmap
                 <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform duration-300" />
               </div>
             </div>
           </Link>
 
-          {/* Get Help */}
+          {/* Resources */}
           <Link
-            href="/dashboard/help"
+            href="/dashboard/resources"
             className="group relative bg-white/90 dark:bg-slate-800/60 backdrop-blur-sm rounded-2xl border border-slate-200 dark:border-slate-700/50 p-6 hover:border-blue-300 dark:hover:border-blue-600 transition-all duration-300 cursor-pointer hover:scale-105 hover:shadow-xl hover:shadow-slate-200/20 dark:hover:shadow-slate-800/20 overflow-hidden"
           >
-            <div className="absolute inset-0 bg-gradient-to-br from-red-500/5 via-transparent to-orange-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+            <div className="absolute inset-0 bg-gradient-to-br from-yellow-500/5 via-transparent to-orange-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
             <div className="relative">
               <div className="flex items-start justify-between mb-4">
-                <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-red-500 via-red-600 to-orange-500 flex items-center justify-center group-hover:scale-110 transition-transform duration-300 shadow-lg">
-                  <HelpCircle className="w-6 h-6 text-white" />
+                <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-yellow-500 via-orange-500 to-red-500 flex items-center justify-center group-hover:scale-110 transition-transform duration-300 shadow-lg">
+                  <Bookmark className="w-6 h-6 text-white" />
                 </div>
                 <div className="flex items-center space-x-2">
-                  <span className="text-xs bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400 px-2 py-1 rounded-full">
-                    24/7 Support
+                  <span className="text-xs bg-yellow-100 dark:bg-yellow-900/30 text-yellow-600 dark:text-yellow-400 px-2 py-1 rounded-full">
+                    Organized
                   </span>
                 </div>
               </div>
               <h3 className="text-lg font-semibold text-slate-800 dark:text-white mb-2">
-                Get Help
+                Learning Resources
               </h3>
               <p className="text-sm text-slate-600 dark:text-slate-400 mb-4">
-                Find answers to your stuck questions
+                Organize and manage your learning materials
               </p>
               <div className="flex items-center text-blue-600 dark:text-blue-400 text-sm font-medium">
-                Ask Question
+                Manage Resources
                 <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform duration-300" />
               </div>
             </div>
@@ -167,14 +161,14 @@ export default function Dashboard() {
             href="/dashboard/community"
             className="group relative bg-white/90 dark:bg-slate-800/60 backdrop-blur-sm rounded-2xl border border-slate-200 dark:border-slate-700/50 p-6 hover:border-blue-300 dark:hover:border-blue-600 transition-all duration-300 cursor-pointer hover:scale-105 hover:shadow-xl hover:shadow-slate-200/20 dark:hover:shadow-slate-800/20 overflow-hidden"
           >
-            <div className="absolute inset-0 bg-gradient-to-br from-yellow-500/5 via-transparent to-orange-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+            <div className="absolute inset-0 bg-gradient-to-br from-red-500/5 via-transparent to-orange-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
             <div className="relative">
               <div className="flex items-start justify-between mb-4">
-                <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-yellow-500 via-orange-500 to-red-500 flex items-center justify-center group-hover:scale-110 transition-transform duration-300 shadow-lg">
+                <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-red-500 via-red-600 to-orange-500 flex items-center justify-center group-hover:scale-110 transition-transform duration-300 shadow-lg">
                   <Users className="w-6 h-6 text-white" />
                 </div>
                 <div className="flex items-center space-x-2">
-                  <span className="text-xs bg-yellow-100 dark:bg-yellow-900/30 text-yellow-600 dark:text-yellow-400 px-2 py-1 rounded-full">
+                  <span className="text-xs bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400 px-2 py-1 rounded-full">
                     Active
                   </span>
                 </div>
@@ -183,7 +177,7 @@ export default function Dashboard() {
                 Community
               </h3>
               <p className="text-sm text-slate-600 dark:text-slate-400 mb-4">
-                Connect with other learners
+                Connect with other self-taught developers
               </p>
               <div className="flex items-center text-blue-600 dark:text-blue-400 text-sm font-medium">
                 Join Discussion
@@ -191,35 +185,110 @@ export default function Dashboard() {
               </div>
             </div>
           </Link>
+
+          {/* Search */}
+          <Link
+            href="/dashboard/search"
+            className="group relative bg-white/90 dark:bg-slate-800/60 backdrop-blur-sm rounded-2xl border border-slate-200 dark:border-slate-700/50 p-6 hover:border-blue-300 dark:hover:border-blue-600 transition-all duration-300 cursor-pointer hover:scale-105 hover:shadow-xl hover:shadow-slate-200/20 dark:hover:shadow-slate-800/20 overflow-hidden"
+          >
+            <div className="absolute inset-0 bg-gradient-to-br from-indigo-500/5 via-transparent to-purple-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+            <div className="relative">
+              <div className="flex items-start justify-between mb-4">
+                <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-indigo-500 via-indigo-600 to-purple-500 flex items-center justify-center group-hover:scale-110 transition-transform duration-300 shadow-lg">
+                  <Search className="w-6 h-6 text-white" />
+                </div>
+                <div className="flex items-center space-x-2">
+                  <span className="text-xs bg-indigo-100 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 px-2 py-1 rounded-full">
+                    Quick Access
+                  </span>
+                </div>
+              </div>
+              <h3 className="text-lg font-semibold text-slate-800 dark:text-white mb-2">
+                Search Everything
+              </h3>
+              <p className="text-sm text-slate-600 dark:text-slate-400 mb-4">
+                Find articles, resources, and community posts
+              </p>
+              <div className="flex items-center text-blue-600 dark:text-blue-400 text-sm font-medium">
+                Start Searching
+                <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform duration-300" />
+              </div>
+            </div>
+          </Link>
         </div>
 
-        {/* Quick Stats */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div className="bg-gradient-to-br from-blue-600 to-indigo-600 rounded-2xl p-6 text-white">
+        {/* Quick Access Section */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {/* Recent Articles */}
+          <div className="bg-white/90 dark:bg-slate-800/60 backdrop-blur-sm rounded-2xl border border-slate-200 dark:border-slate-700/50 p-6">
             <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-semibold">Learning Streak</h3>
-              <Sparkles className="w-5 h-5" />
+              <h3 className="text-lg font-semibold text-slate-800 dark:text-white">
+                Recent Articles
+              </h3>
+              <Link
+                href="/dashboard/blog"
+                className="text-sm text-blue-600 dark:text-blue-400 hover:underline"
+              >
+                View All
+              </Link>
             </div>
-            <p className="text-3xl font-bold mb-2">5 Days</p>
-            <p className="text-blue-100 text-sm">Keep it up!</p>
+            <div className="space-y-4">
+              <div className="p-4 bg-slate-50 dark:bg-slate-700/50 rounded-xl">
+                <h4 className="font-medium text-slate-800 dark:text-white mb-1">
+                  Understanding React Hooks
+                </h4>
+                <p className="text-sm text-slate-600 dark:text-slate-400">
+                  A comprehensive guide to React Hooks and their use cases
+                </p>
+              </div>
+              <div className="p-4 bg-slate-50 dark:bg-slate-700/50 rounded-xl">
+                <h4 className="font-medium text-slate-800 dark:text-white mb-1">
+                  TypeScript Best Practices
+                </h4>
+                <p className="text-sm text-slate-600 dark:text-slate-400">
+                  Learn how to write better TypeScript code
+                </p>
+              </div>
+            </div>
           </div>
 
-          <div className="bg-gradient-to-br from-purple-600 to-pink-600 rounded-2xl p-6 text-white">
+          {/* Community Activity */}
+          <div className="bg-white/90 dark:bg-slate-800/60 backdrop-blur-sm rounded-2xl border border-slate-200 dark:border-slate-700/50 p-6">
             <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-semibold">Topics Completed</h3>
-              <Target className="w-5 h-5" />
+              <h3 className="text-lg font-semibold text-slate-800 dark:text-white">
+                Community Activity
+              </h3>
+              <Link
+                href="/dashboard/community"
+                className="text-sm text-blue-600 dark:text-blue-400 hover:underline"
+              >
+                View All
+              </Link>
             </div>
-            <p className="text-3xl font-bold mb-2">12</p>
-            <p className="text-purple-100 text-sm">Making progress!</p>
-          </div>
-
-          <div className="bg-gradient-to-br from-green-600 to-emerald-600 rounded-2xl p-6 text-white">
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-semibold">Time Spent</h3>
-              <Clock className="w-5 h-5" />
+            <div className="space-y-4">
+              <div className="p-4 bg-slate-50 dark:bg-slate-700/50 rounded-xl">
+                <div className="flex items-center space-x-2 mb-2">
+                  <MessageSquare className="w-4 h-4 text-blue-600 dark:text-blue-400" />
+                  <span className="text-sm font-medium text-slate-800 dark:text-white">
+                    New Discussion
+                  </span>
+                </div>
+                <p className="text-sm text-slate-600 dark:text-slate-400">
+                  &ldquo;Best practices for learning web development&rdquo;
+                </p>
+              </div>
+              <div className="p-4 bg-slate-50 dark:bg-slate-700/50 rounded-xl">
+                <div className="flex items-center space-x-2 mb-2">
+                  <TrendingUp className="w-4 h-4 text-green-600 dark:text-green-400" />
+                  <span className="text-sm font-medium text-slate-800 dark:text-white">
+                    Trending Topic
+                  </span>
+                </div>
+                <p className="text-sm text-slate-600 dark:text-slate-400">
+                  &ldquo;Career transition into tech&rdquo;
+                </p>
+              </div>
             </div>
-            <p className="text-3xl font-bold mb-2">24h</p>
-            <p className="text-green-100 text-sm">This week</p>
           </div>
         </div>
       </div>
