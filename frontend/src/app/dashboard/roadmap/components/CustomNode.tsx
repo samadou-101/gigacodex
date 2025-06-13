@@ -1,5 +1,5 @@
 "use client";
-import { NodeProps } from "reactflow";
+import { NodeProps, Handle, Position } from "reactflow";
 import { Code2 } from "lucide-react";
 
 interface CustomNodeData {
@@ -18,6 +18,11 @@ export const CustomNode = ({ data, selected }: NodeProps<CustomNodeData>) => {
           : "border-slate-200 dark:border-slate-700 bg-white/90 dark:bg-slate-800/90"
       }`}
     >
+      <Handle
+        type="target"
+        position={Position.Top}
+        className="w-3 h-3 bg-blue-500"
+      />
       <div className="flex items-center space-x-2">
         <div className="w-6 h-6 rounded-lg bg-gradient-to-br from-blue-500 to-indigo-500 flex items-center justify-center">
           <Code2 className="w-4 h-4 text-white" />
@@ -31,6 +36,11 @@ export const CustomNode = ({ data, selected }: NodeProps<CustomNodeData>) => {
           </p>
         </div>
       </div>
+      <Handle
+        type="source"
+        position={Position.Bottom}
+        className="w-3 h-3 bg-blue-500"
+      />
     </div>
   );
 };

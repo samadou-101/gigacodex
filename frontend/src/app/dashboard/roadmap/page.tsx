@@ -81,8 +81,17 @@ export default function Roadmap() {
   const reactFlowWrapper = useRef<HTMLDivElement>(null);
 
   const onConnect = useCallback(
-    (params: Connection) => setEdges((eds) => addEdge(params, eds)),
-    [setEdges]
+    (params: Connection) => {
+      // Check if the connection already exists
+      const connectionExists = edges.some(
+        (edge) => edge.source === params.source && edge.target === params.target
+      );
+
+      if (!connectionExists) {
+        setEdges((eds) => addEdge({ ...params, animated: true }, eds));
+      }
+    },
+    [edges, setEdges]
   );
 
   const onNodeClick = useCallback(
@@ -152,6 +161,71 @@ export default function Roadmap() {
     [setNodes]
   );
 
+  const addNodeBetween = useCallback(
+    (sourceNode: Node<CustomNodeData>, targetNode: Node<CustomNodeData>) => {
+      // Calculate position between source and target nodes
+      const sourceY = sourceNode.position.y;
+      const targetY = targetNode.position.y;
+      const newY = sourceY + (targetY - sourceY) / 2;
+
+      // Create new node
+      const newNode: Node<CustomNodeData> = {
+        id: `${nodes.length + 1}`,
+        type: "custom",
+        position: { x: sourceNode.position.x, y: newY },
+        data: {
+          label: "New Learning Step",
+          description: "Add your description here",
+          tag: "New",
+        },
+      };
+
+      // Add new node
+      setNodes((nds) => [...nds, newNode]);
+
+      // Remove old connection
+      setEdges((eds) =>
+        eds.filter(
+          (edge) =>
+            !(edge.source === sourceNode.id && edge.target === targetNode.id)
+        )
+      );
+
+      // Add new connections
+      setEdges((eds) => [
+        ...eds,
+        {
+          id: `e${sourceNode.id}-${newNode.id}`,
+          source: sourceNode.id,
+          target: newNode.id,
+          animated: true,
+        },
+        {
+          id: `e${newNode.id}-${targetNode.id}`,
+          source: newNode.id,
+          target: targetNode.id,
+          animated: true,
+        },
+      ]);
+    },
+    [nodes, setNodes, setEdges]
+  );
+
+  const onEdgeClick = useCallback(
+    (event: React.MouseEvent, edge: Edge) => {
+      const sourceNode = nodes.find((node) => node.id === edge.source);
+      const targetNode = nodes.find((node) => node.id === edge.target);
+
+      if (sourceNode && targetNode) {
+        addNodeBetween(
+          sourceNode as Node<CustomNodeData>,
+          targetNode as Node<CustomNodeData>
+        );
+      }
+    },
+    [nodes, addNodeBetween]
+  );
+
   return (
     <div className="h-[calc(100vh-3rem)] w-full bg-gradient-to-br from-slate-50 via-white to-blue-50/30 dark:from-slate-950 dark:via-slate-900 dark:to-blue-950/30">
       {/* Theme Toggle */}
@@ -167,6 +241,7 @@ export default function Roadmap() {
           onNodesChange={onNodesChange}
           onEdgesChange={onEdgesChange}
           onConnect={onConnect}
+          onEdgeClick={onEdgeClick}
           onNodeClick={onNodeClick}
           nodeTypes={nodeTypes}
           fitView
