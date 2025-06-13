@@ -14,7 +14,11 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 
-export function Sidebar() {
+interface SidebarProps {
+  onStateChange?: (isOpen: boolean) => void;
+}
+
+export function Sidebar({ onStateChange }: SidebarProps) {
   const [isOpen, setIsOpen] = useState(true);
   const pathname = usePathname();
 
@@ -22,15 +26,18 @@ export function Sidebar() {
   useEffect(() => {
     const savedState = localStorage.getItem("gigacodex-sidebar");
     if (savedState) {
-      setIsOpen(JSON.parse(savedState));
+      const parsedState = JSON.parse(savedState);
+      setIsOpen(parsedState);
+      onStateChange?.(parsedState);
     }
-  }, []);
+  }, [onStateChange]);
 
   // Save state to localStorage when it changes
   const toggleSidebar = () => {
     const newState = !isOpen;
     setIsOpen(newState);
     localStorage.setItem("gigacodex-sidebar", JSON.stringify(newState));
+    onStateChange?.(newState);
   };
 
   const mainNav = [

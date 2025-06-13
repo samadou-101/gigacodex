@@ -1,23 +1,21 @@
 "use client";
-import { useState, useCallback, useRef } from "react";
+import { useCallback, useRef, useState } from "react";
 import ReactFlow, {
-  Node,
-  Edge,
-  Controls,
   Background,
+  Controls,
   MiniMap,
+  Panel,
   useNodesState,
   useEdgesState,
   addEdge,
-  Connection,
-  Panel,
-  NodeResizer,
-  NodeTypes,
   NodeProps,
+  Connection,
+  Edge,
+  Node,
 } from "reactflow";
 import "reactflow/dist/style.css";
 import { ThemeToggle } from "@/components/ThemeToggle";
-import { Plus, Save, Trash2, Brain, Link as LinkIcon } from "lucide-react";
+import { Plus, Save, Trash2, Code2, Brain } from "lucide-react";
 
 interface CustomNodeData {
   label: string;
@@ -27,49 +25,33 @@ interface CustomNodeData {
 }
 
 // Custom node types
-const CustomNode = ({ data, selected }: NodeProps<CustomNodeData>) => {
+const CustomNode = ({ data, selected }: NodeProps) => {
   return (
-    <div className="relative">
-      <NodeResizer
-        minWidth={200}
-        minHeight={100}
-        isVisible={selected}
-        lineStyle={{ borderWidth: 2 }}
-        handleStyle={{ width: 8, height: 8 }}
-      />
-      <div className="bg-white dark:bg-slate-800 rounded-xl border-2 border-slate-200 dark:border-slate-700 p-4 shadow-lg">
-        <div className="flex items-start justify-between mb-2">
-          <h3 className="font-semibold text-slate-900 dark:text-white">
+    <div
+      className={`p-2 rounded-lg border-2 shadow-lg transition-all duration-300 ${
+        selected
+          ? "border-blue-500 bg-blue-50 dark:bg-blue-950/50"
+          : "border-slate-200 dark:border-slate-700 bg-white/90 dark:bg-slate-800/90"
+      }`}
+    >
+      <div className="flex items-center space-x-2">
+        <div className="w-6 h-6 rounded-lg bg-gradient-to-br from-blue-500 to-indigo-500 flex items-center justify-center">
+          <Code2 className="w-4 h-4 text-white" />
+        </div>
+        <div>
+          <h3 className="text-sm font-semibold text-slate-900 dark:text-white">
             {data.label}
           </h3>
-          <div className="flex items-center space-x-2">
-            {data.tag && (
-              <span className="text-xs bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 px-2 py-1 rounded-full">
-                {data.tag}
-              </span>
-            )}
-          </div>
+          <p className="text-xs text-slate-600 dark:text-slate-400">
+            {data.description}
+          </p>
         </div>
-        <p className="text-sm text-slate-600 dark:text-slate-400 mb-3">
-          {data.description}
-        </p>
-        {data.link && (
-          <a
-            href={data.link}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-xs text-blue-600 dark:text-blue-400 hover:underline flex items-center"
-          >
-            <LinkIcon className="w-3 h-3 mr-1" />
-            Resource Link
-          </a>
-        )}
       </div>
     </div>
   );
 };
 
-const nodeTypes: NodeTypes = {
+const nodeTypes = {
   custom: CustomNode,
 };
 
@@ -180,7 +162,7 @@ export default function Roadmap() {
   }, [setNodes, setEdges]);
 
   return (
-    <div className="h-screen w-full bg-gradient-to-br from-slate-50 via-white to-blue-50/30 dark:from-slate-950 dark:via-slate-900 dark:to-blue-950/30">
+    <div className="h-[calc(100vh-3rem)] w-full bg-gradient-to-br from-slate-50 via-white to-blue-50/30 dark:from-slate-950 dark:via-slate-900 dark:to-blue-950/30">
       {/* Theme Toggle */}
       <div className="fixed top-4 right-4 z-50">
         <ThemeToggle />
@@ -197,6 +179,11 @@ export default function Roadmap() {
           onNodeClick={onNodeClick}
           nodeTypes={nodeTypes}
           fitView
+          fitViewOptions={{ padding: 1.5, minZoom: 0.1, maxZoom: 2 }}
+          defaultViewport={{ x: 0, y: 0, zoom: 0.55 }}
+          minZoom={0.1}
+          maxZoom={2}
+          className="bg-transparent"
         >
           <Background />
           <Controls />
