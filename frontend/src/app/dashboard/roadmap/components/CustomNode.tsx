@@ -1,6 +1,5 @@
 "use client";
 import { NodeProps, Handle, Position } from "reactflow";
-import { Code2 } from "lucide-react";
 
 interface CustomNodeData {
   label: string;
@@ -25,15 +24,8 @@ export const CustomNode = ({ data, selected }: NodeProps<CustomNodeData>) => {
         className="w-3 h-3 bg-blue-500"
       />
       <div className="flex items-center space-x-2">
-        <div className="relative">
-          <div className="w-6 h-6 rounded-lg bg-gradient-to-br from-blue-500 to-indigo-500 flex items-center justify-center">
-            <Code2 className="w-4 h-4 text-white" />
-          </div>
-          {data.number && (
-            <div className="absolute -top-2 -right-2 w-5 h-5 rounded-full bg-blue-600 text-white text-xs flex items-center justify-center font-bold">
-              {data.number}
-            </div>
-          )}
+        <div className="w-6 h-6 rounded-lg bg-gradient-to-br from-blue-500 to-indigo-500 flex items-center justify-center text-white font-semibold text-sm">
+          {data.number}
         </div>
         <div>
           <h3 className="text-sm font-semibold text-slate-900 dark:text-white">
