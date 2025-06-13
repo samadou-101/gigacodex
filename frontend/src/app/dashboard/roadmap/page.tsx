@@ -1,5 +1,5 @@
 "use client";
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useRef, useState, useEffect } from "react";
 import ReactFlow, {
   Background,
   Controls,
@@ -23,6 +23,7 @@ interface CustomNodeData {
   description: string;
   tag?: string;
   link?: string;
+  number?: number;
 }
 
 const nodeTypes = {
@@ -71,6 +72,45 @@ const initialEdges: Edge[] = [
   { id: "e2-3", source: "2", target: "3", animated: true },
 ];
 
+// Helper function to assign numbers to nodes based on their connections
+const assignNodeNumbers = (nodes: Node<CustomNodeData>[], edges: Edge[]) => {
+  // Find root nodes (nodes with no incoming edges)
+  const rootNodes = nodes.filter(
+    (node) => !edges.some((edge) => edge.target === node.id)
+  );
+
+  // Create a map to store node numbers
+  const nodeNumbers = new Map<string, number>();
+  let currentNumber = 1;
+
+  // Function to recursively assign numbers
+  const assignNumber = (nodeId: string) => {
+    if (!nodeNumbers.has(nodeId)) {
+      nodeNumbers.set(nodeId, currentNumber++);
+
+      // Find all outgoing edges
+      const outgoingEdges = edges.filter((edge) => edge.source === nodeId);
+
+      // Recursively assign numbers to connected nodes
+      outgoingEdges.forEach((edge) => {
+        assignNumber(edge.target);
+      });
+    }
+  };
+
+  // Start numbering from root nodes
+  rootNodes.forEach((node) => assignNumber(node.id));
+
+  // Update nodes with their numbers
+  return nodes.map((node) => ({
+    ...node,
+    data: {
+      ...node.data,
+      number: nodeNumbers.get(node.id),
+    },
+  }));
+};
+
 export default function Roadmap() {
   const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
   const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
@@ -79,6 +119,11 @@ export default function Roadmap() {
   );
   const [showMiniMap, setShowMiniMap] = useState(true);
   const reactFlowWrapper = useRef<HTMLDivElement>(null);
+
+  // Update node numbers whenever nodes or edges change
+  useEffect(() => {
+    setNodes((nds) => assignNodeNumbers(nds, edges));
+  }, [edges, setNodes]);
 
   const onConnect = useCallback(
     (params: Connection) => {
