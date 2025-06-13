@@ -1,272 +1,386 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 "use client";
-import { useState } from "react";
-import {
-  Plus,
-  ChevronDown,
-  ChevronRight,
-  CheckCircle2,
-  Circle,
-  Clock,
-  BookOpen,
-  Code2,
-  Database,
-  Globe,
-  Layers,
-  Lightbulb,
-  Rocket,
-  Server,
-  Sparkles,
-  Target,
-  Zap,
-} from "lucide-react";
+import { useState, useCallback, useRef } from "react";
+import ReactFlow, {
+  Node,
+  Edge,
+  Controls,
+  Background,
+  MiniMap,
+  useNodesState,
+  useEdgesState,
+  addEdge,
+  Connection,
+  Panel,
+  NodeResizer,
+  NodeTypes,
+  NodeProps,
+} from "reactflow";
+import "reactflow/dist/style.css";
 import { ThemeToggle } from "@/components/ThemeToggle";
-import Link from "next/link";
+import { Plus, Save, Trash2, Brain, Link as LinkIcon } from "lucide-react";
 
-type TopicStatus = "completed" | "in-progress" | "upcoming";
-
-interface Topic {
-  name: string;
-  status: TopicStatus;
-}
-
-interface LearningPath {
-  title: string;
+interface CustomNodeData {
+  label: string;
   description: string;
-  icon: React.ElementType;
-  color: string;
-  badge: string;
-  progress: number;
-  topics: Topic[];
+  tag?: string;
+  link?: string;
 }
 
-const learningPaths: LearningPath[] = [
+// Custom node types
+const CustomNode = ({ data, selected }: NodeProps<CustomNodeData>) => {
+  return (
+    <div className="relative">
+      <NodeResizer
+        minWidth={200}
+        minHeight={100}
+        isVisible={selected}
+        lineStyle={{ borderWidth: 2 }}
+        handleStyle={{ width: 8, height: 8 }}
+      />
+      <div className="bg-white dark:bg-slate-800 rounded-xl border-2 border-slate-200 dark:border-slate-700 p-4 shadow-lg">
+        <div className="flex items-start justify-between mb-2">
+          <h3 className="font-semibold text-slate-900 dark:text-white">
+            {data.label}
+          </h3>
+          <div className="flex items-center space-x-2">
+            {data.tag && (
+              <span className="text-xs bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 px-2 py-1 rounded-full">
+                {data.tag}
+              </span>
+            )}
+          </div>
+        </div>
+        <p className="text-sm text-slate-600 dark:text-slate-400 mb-3">
+          {data.description}
+        </p>
+        {data.link && (
+          <a
+            href={data.link}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-xs text-blue-600 dark:text-blue-400 hover:underline flex items-center"
+          >
+            <LinkIcon className="w-3 h-3 mr-1" />
+            Resource Link
+          </a>
+        )}
+      </div>
+    </div>
+  );
+};
+
+const nodeTypes: NodeTypes = {
+  custom: CustomNode,
+};
+
+// Initial nodes and edges for the example roadmap
+const initialNodes: Node<CustomNodeData>[] = [
   {
-    title: "Frontend Development",
-    description: "Master modern web development with React and Next.js",
-    icon: Globe,
-    color: "from-blue-500 to-indigo-500",
-    badge: "Popular",
-    progress: 65,
-    topics: [
-      { name: "HTML & CSS Fundamentals", status: "completed" },
-      { name: "JavaScript Essentials", status: "completed" },
-      { name: "React Basics", status: "in-progress" },
-      { name: "Next.js & Server Components", status: "upcoming" },
-      { name: "State Management", status: "upcoming" },
-    ],
+    id: "1",
+    type: "custom",
+    position: { x: 250, y: 0 },
+    data: {
+      label: "HTML & CSS Fundamentals",
+      description: "Learn the basics of web markup and styling",
+      tag: "Frontend",
+      link: "https://developer.mozilla.org/en-US/docs/Web/HTML",
+    },
   },
   {
-    title: "Backend Development",
-    description: "Build robust server-side applications",
-    icon: Server,
-    color: "from-purple-500 to-pink-500",
-    badge: "New",
-    progress: 30,
-    topics: [
-      { name: "Node.js Fundamentals", status: "completed" },
-      { name: "Express.js", status: "in-progress" },
-      { name: "Database Design", status: "upcoming" },
-      { name: "API Development", status: "upcoming" },
-      { name: "Authentication", status: "upcoming" },
-    ],
+    id: "2",
+    type: "custom",
+    position: { x: 250, y: 150 },
+    data: {
+      label: "JavaScript Basics",
+      description: "Master JavaScript fundamentals and ES6+ features",
+      tag: "Frontend",
+      link: "https://developer.mozilla.org/en-US/docs/Web/JavaScript",
+    },
   },
   {
-    title: "Full Stack Development",
-    description: "Become a complete web developer",
-    icon: Layers,
-    color: "from-green-500 to-emerald-500",
-    badge: "Advanced",
-    progress: 15,
-    topics: [
-      { name: "System Design", status: "upcoming" },
-      { name: "DevOps Basics", status: "upcoming" },
-      { name: "Testing Strategies", status: "upcoming" },
-      { name: "Performance Optimization", status: "upcoming" },
-      { name: "Security Best Practices", status: "upcoming" },
-    ],
+    id: "3",
+    type: "custom",
+    position: { x: 250, y: 300 },
+    data: {
+      label: "React Fundamentals",
+      description: "Learn React core concepts and hooks",
+      tag: "Frontend",
+      link: "https://react.dev/",
+    },
   },
 ];
 
-const statusColors: Record<TopicStatus, string> = {
-  completed:
-    "bg-green-100 text-green-600 dark:bg-green-900/30 dark:text-green-400",
-  "in-progress":
-    "bg-blue-100 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400",
-  upcoming:
-    "bg-slate-100 text-slate-600 dark:bg-slate-700/50 dark:text-slate-400",
-};
+const initialEdges: Edge[] = [
+  { id: "e1-2", source: "1", target: "2", animated: true },
+  { id: "e2-3", source: "2", target: "3", animated: true },
+];
 
 export default function Roadmap() {
-  const [isAddingTopic, setIsAddingTopic] = useState(false);
-  const [selectedModule, setSelectedModule] = useState<string | null>(null);
+  const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
+  const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
+  const [selectedNode, setSelectedNode] = useState<Node<CustomNodeData> | null>(
+    null
+  );
+  const reactFlowWrapper = useRef<HTMLDivElement>(null);
 
-  // Mock data for demonstration
-  const modules = [
-    {
-      id: "1",
-      title: "Frontend Development",
-      topics: [
-        { id: "1-1", title: "HTML & CSS Basics", status: "completed" },
-        { id: "1-2", title: "JavaScript Fundamentals", status: "in-progress" },
-        { id: "1-3", title: "React.js", status: "not-started" },
-      ],
+  const onConnect = useCallback(
+    (params: Connection) => setEdges((eds) => addEdge(params, eds)),
+    [setEdges]
+  );
+
+  const onNodeClick = useCallback(
+    (event: React.MouseEvent, node: Node<CustomNodeData>) => {
+      setSelectedNode(node);
     },
-    {
-      id: "2",
-      title: "Backend Development",
-      topics: [
-        { id: "2-1", title: "Node.js Basics", status: "not-started" },
-        { id: "2-2", title: "Express.js", status: "not-started" },
-        { id: "2-3", title: "Database Design", status: "not-started" },
-      ],
-    },
-  ];
+    []
+  );
+
+  const addNewNode = useCallback(() => {
+    const newNode: Node<CustomNodeData> = {
+      id: `${nodes.length + 1}`,
+      type: "custom",
+      position: { x: 250, y: nodes.length * 150 },
+      data: {
+        label: "New Learning Step",
+        description: "Add your description here",
+        tag: "New",
+      },
+    };
+    setNodes((nds) => [...nds, newNode]);
+  }, [nodes, setNodes]);
+
+  const deleteSelectedNodes = useCallback(() => {
+    if (selectedNode) {
+      setNodes((nds) => nds.filter((node) => node.id !== selectedNode.id));
+      setEdges((eds) =>
+        eds.filter(
+          (edge) =>
+            edge.source !== selectedNode.id && edge.target !== selectedNode.id
+        )
+      );
+      setSelectedNode(null);
+    }
+  }, [selectedNode, setNodes, setEdges]);
+
+  const saveRoadmap = useCallback(() => {
+    const roadmapData = {
+      nodes,
+      edges,
+    };
+    localStorage.setItem("roadmap", JSON.stringify(roadmapData));
+  }, [nodes, edges]);
+
+  const loadRoadmap = useCallback(() => {
+    const savedRoadmap = localStorage.getItem("roadmap");
+    if (savedRoadmap) {
+      const { nodes: savedNodes, edges: savedEdges } = JSON.parse(savedRoadmap);
+      setNodes(savedNodes);
+      setEdges(savedEdges);
+    }
+  }, [setNodes, setEdges]);
 
   return (
-    <div className="space-y-8">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold text-slate-900 dark:text-white">
-            Learning Roadmap
-          </h1>
-          <p className="text-slate-600 dark:text-slate-400 mt-2">
-            Track your progress and plan your learning journey
-          </p>
-        </div>
-        <button className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl flex items-center space-x-2 transition-colors">
-          <Sparkles className="w-4 h-4" />
-          <span>Customize Path</span>
-        </button>
+    <div className="h-screen w-full bg-gradient-to-br from-slate-50 via-white to-blue-50/30 dark:from-slate-950 dark:via-slate-900 dark:to-blue-950/30">
+      {/* Theme Toggle */}
+      <div className="fixed top-4 right-4 z-50">
+        <ThemeToggle />
       </div>
 
-      {/* Learning Paths */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {learningPaths.map((path, index) => (
-          <div
-            key={index}
-            className="bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 overflow-hidden"
+      {/* ReactFlow Canvas */}
+      <div className="h-full w-full" ref={reactFlowWrapper}>
+        <ReactFlow
+          nodes={nodes}
+          edges={edges}
+          onNodesChange={onNodesChange}
+          onEdgesChange={onEdgesChange}
+          onConnect={onConnect}
+          onNodeClick={onNodeClick}
+          nodeTypes={nodeTypes}
+          fitView
+        >
+          <Background />
+          <Controls />
+          <MiniMap />
+
+          {/* Toolbar */}
+          <Panel
+            position="top-left"
+            className="bg-white/90 dark:bg-slate-800/90 backdrop-blur-sm rounded-xl border border-slate-200 dark:border-slate-700 p-2 shadow-lg"
           >
-            {/* Path Header */}
-            <div className="p-6">
-              <div className="flex items-start justify-between mb-4">
-                <div
-                  className={`w-12 h-12 rounded-xl bg-gradient-to-br ${path.color} flex items-center justify-center`}
-                >
-                  <path.icon className="w-6 h-6 text-white" />
-                </div>
-                <span className="text-xs bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 px-2 py-1 rounded-full">
-                  {path.badge}
-                </span>
-              </div>
-              <h3 className="text-xl font-semibold text-slate-900 dark:text-white mb-2">
-                {path.title}
-              </h3>
-              <p className="text-sm text-slate-600 dark:text-slate-400 mb-4">
-                {path.description}
-              </p>
-              <div className="space-y-2">
-                <div className="flex items-center justify-between text-sm">
-                  <span className="text-slate-600 dark:text-slate-400">
-                    Progress
-                  </span>
-                  <span className="font-medium text-slate-900 dark:text-white">
-                    {path.progress}%
-                  </span>
-                </div>
-                <div className="h-2 bg-slate-100 dark:bg-slate-700 rounded-full overflow-hidden">
-                  <div
-                    className="h-full bg-gradient-to-r from-blue-500 to-indigo-500 rounded-full"
-                    style={{ width: `${path.progress}%` }}
-                  ></div>
-                </div>
-              </div>
-            </div>
-
-            {/* Topics List */}
-            <div className="border-t border-slate-200 dark:border-slate-700">
-              {path.topics.map((topic, topicIndex) => (
-                <div
-                  key={topicIndex}
-                  className="flex items-center justify-between p-4 hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors"
-                >
-                  <div className="flex items-center space-x-3">
-                    <div
-                      className={`w-8 h-8 rounded-lg flex items-center justify-center ${
-                        statusColors[topic.status]
-                      }`}
-                    >
-                      {topic.status === "completed" ? (
-                        <Target className="w-4 h-4" />
-                      ) : topic.status === "in-progress" ? (
-                        <Zap className="w-4 h-4" />
-                      ) : (
-                        <Lightbulb className="w-4 h-4" />
-                      )}
-                    </div>
-                    <span className="text-sm font-medium text-slate-900 dark:text-white">
-                      {topic.name}
-                    </span>
-                  </div>
-                  <span
-                    className={`text-xs px-2 py-1 rounded-full ${
-                      statusColors[topic.status]
-                    }`}
-                  >
-                    {topic.status === "completed"
-                      ? "Completed"
-                      : topic.status === "in-progress"
-                      ? "In Progress"
-                      : "Upcoming"}
-                  </span>
-                </div>
-              ))}
-            </div>
-
-            {/* Action Button */}
-            <div className="p-4 border-t border-slate-200 dark:border-slate-700">
-              <Link
-                href={`/dashboard/roadmap/${path.title
-                  .toLowerCase()
-                  .replace(/\s+/g, "-")}`}
-                className="block w-full px-4 py-2 text-center text-sm font-medium text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/30 rounded-xl transition-colors"
+            <div className="flex items-center space-x-2">
+              <button
+                onClick={addNewNode}
+                className="p-2 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg transition-colors"
+                title="Add Node"
               >
-                Continue Learning
-              </Link>
+                <Plus className="w-5 h-5 text-slate-600 dark:text-slate-400" />
+              </button>
+              <button
+                onClick={deleteSelectedNodes}
+                className="p-2 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg transition-colors"
+                title="Delete Selected"
+              >
+                <Trash2 className="w-5 h-5 text-slate-600 dark:text-slate-400" />
+              </button>
+              <button
+                onClick={saveRoadmap}
+                className="p-2 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg transition-colors"
+                title="Save Roadmap"
+              >
+                <Save className="w-5 h-5 text-slate-600 dark:text-slate-400" />
+              </button>
+              <button
+                onClick={loadRoadmap}
+                className="p-2 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg transition-colors"
+                title="Load Roadmap"
+              >
+                <Save className="w-5 h-5 text-slate-600 dark:text-slate-400" />
+              </button>
             </div>
-          </div>
-        ))}
-      </div>
+          </Panel>
 
-      {/* Quick Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div className="bg-gradient-to-br from-blue-600 to-indigo-600 rounded-2xl p-6 text-white">
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="text-lg font-semibold">Current Streak</h3>
-            <Sparkles className="w-5 h-5" />
-          </div>
-          <p className="text-3xl font-bold mb-2">7 Days</p>
-          <p className="text-blue-100 text-sm">Keep up the good work!</p>
-        </div>
+          {/* Node Editor Panel */}
+          {selectedNode && (
+            <Panel
+              position="top-right"
+              className="bg-white/90 dark:bg-slate-800/90 backdrop-blur-sm rounded-xl border border-slate-200 dark:border-slate-700 p-4 shadow-lg w-80"
+            >
+              <div className="space-y-4">
+                <h3 className="font-semibold text-slate-900 dark:text-white">
+                  Edit Node
+                </h3>
+                <div className="space-y-2">
+                  <label className="block text-sm font-medium text-slate-700 dark:text-slate-300">
+                    Title
+                  </label>
+                  <input
+                    type="text"
+                    value={selectedNode.data.label}
+                    onChange={(e) =>
+                      setNodes((nds) =>
+                        nds.map((node) =>
+                          node.id === selectedNode.id
+                            ? {
+                                ...node,
+                                data: { ...node.data, label: e.target.value },
+                              }
+                            : node
+                        )
+                      )
+                    }
+                    className="w-full px-3 py-2 bg-white dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-lg text-slate-900 dark:text-white"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label className="block text-sm font-medium text-slate-700 dark:text-slate-300">
+                    Description
+                  </label>
+                  <textarea
+                    value={selectedNode.data.description}
+                    onChange={(e) =>
+                      setNodes((nds) =>
+                        nds.map((node) =>
+                          node.id === selectedNode.id
+                            ? {
+                                ...node,
+                                data: {
+                                  ...node.data,
+                                  description: e.target.value,
+                                },
+                              }
+                            : node
+                        )
+                      )
+                    }
+                    className="w-full px-3 py-2 bg-white dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-lg text-slate-900 dark:text-white"
+                    rows={3}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label className="block text-sm font-medium text-slate-700 dark:text-slate-300">
+                    Tag
+                  </label>
+                  <input
+                    type="text"
+                    value={selectedNode.data.tag}
+                    onChange={(e) =>
+                      setNodes((nds) =>
+                        nds.map((node) =>
+                          node.id === selectedNode.id
+                            ? {
+                                ...node,
+                                data: { ...node.data, tag: e.target.value },
+                              }
+                            : node
+                        )
+                      )
+                    }
+                    className="w-full px-3 py-2 bg-white dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-lg text-slate-900 dark:text-white"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label className="block text-sm font-medium text-slate-700 dark:text-slate-300">
+                    Resource Link
+                  </label>
+                  <input
+                    type="url"
+                    value={selectedNode.data.link || ""}
+                    onChange={(e) =>
+                      setNodes((nds) =>
+                        nds.map((node) =>
+                          node.id === selectedNode.id
+                            ? {
+                                ...node,
+                                data: { ...node.data, link: e.target.value },
+                              }
+                            : node
+                        )
+                      )
+                    }
+                    className="w-full px-3 py-2 bg-white dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-lg text-slate-900 dark:text-white"
+                    placeholder="https://..."
+                  />
+                </div>
+                <button
+                  onClick={() => setSelectedNode(null)}
+                  className="w-full px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors"
+                >
+                  Done
+                </button>
+              </div>
+            </Panel>
+          )}
 
-        <div className="bg-gradient-to-br from-purple-600 to-pink-600 rounded-2xl p-6 text-white">
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="text-lg font-semibold">Topics Completed</h3>
-            <Target className="w-5 h-5" />
-          </div>
-          <p className="text-3xl font-bold mb-2">24</p>
-          <p className="text-purple-100 text-sm">Making great progress!</p>
-        </div>
-
-        <div className="bg-gradient-to-br from-green-600 to-emerald-600 rounded-2xl p-6 text-white">
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="text-lg font-semibold">Next Milestone</h3>
-            <Rocket className="w-5 h-5" />
-          </div>
-          <p className="text-3xl font-bold mb-2">React Hooks</p>
-          <p className="text-green-100 text-sm">2 topics away</p>
-        </div>
+          {/* AI Assistant Panel */}
+          {selectedNode && (
+            <Panel
+              position="bottom-right"
+              className="bg-white/90 dark:bg-slate-800/90 backdrop-blur-sm rounded-xl border border-slate-200 dark:border-slate-700 p-4 shadow-lg w-80"
+            >
+              <div className="space-y-4">
+                <div className="flex items-center space-x-2">
+                  <Brain className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+                  <h3 className="font-semibold text-slate-900 dark:text-white">
+                    AI Assistant
+                  </h3>
+                </div>
+                <p className="text-sm text-slate-600 dark:text-slate-400">
+                  Ask AI about this learning step
+                </p>
+                <div className="space-y-2">
+                  <textarea
+                    className="w-full px-3 py-2 bg-white dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-lg text-slate-900 dark:text-white"
+                    rows={3}
+                    placeholder="Ask anything about this topic..."
+                  />
+                  <button className="w-full px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors">
+                    Ask AI
+                  </button>
+                </div>
+              </div>
+            </Panel>
+          )}
+        </ReactFlow>
       </div>
     </div>
   );
