@@ -15,7 +15,7 @@ import ReactFlow, {
 } from "reactflow";
 import "reactflow/dist/style.css";
 import { ThemeToggle } from "@/components/ThemeToggle";
-import { Plus, Save, Trash2, Code2, Brain } from "lucide-react";
+import { Plus, Save, Trash2, Code2, Brain, Map } from "lucide-react";
 
 interface CustomNodeData {
   label: string;
@@ -103,6 +103,7 @@ export default function Roadmap() {
   const [selectedNode, setSelectedNode] = useState<Node<CustomNodeData> | null>(
     null
   );
+  const [showMiniMap, setShowMiniMap] = useState(true);
   const reactFlowWrapper = useRef<HTMLDivElement>(null);
 
   const onConnect = useCallback(
@@ -184,10 +185,11 @@ export default function Roadmap() {
           minZoom={0.1}
           maxZoom={2}
           className="bg-transparent"
+          proOptions={{ hideAttribution: true }}
         >
           <Background />
           <Controls />
-          <MiniMap />
+          {showMiniMap && <MiniMap />}
 
           {/* Toolbar */}
           <Panel
@@ -222,6 +224,13 @@ export default function Roadmap() {
                 title="Load Roadmap"
               >
                 <Save className="w-5 h-5 text-slate-600 dark:text-slate-400" />
+              </button>
+              <button
+                onClick={() => setShowMiniMap(!showMiniMap)}
+                className="p-2 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg transition-colors"
+                title={showMiniMap ? "Hide MiniMap" : "Show MiniMap"}
+              >
+                <Map className="w-5 h-5 text-slate-600 dark:text-slate-400" />
               </button>
             </div>
           </Panel>
