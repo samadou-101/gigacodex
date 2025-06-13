@@ -337,9 +337,32 @@ export default function Roadmap() {
           proOptions={{ hideAttribution: true }}
         >
           <Background />
-          <Controls />
-          {showMiniMap && <MiniMap />}
-
+          <Controls
+            className="[&>button]:!bg-white/90 dark:[&>button]:!bg-slate-800 [&>button]:!backdrop-blur-sm [&>button]:!border [&>button]:!border-slate-200 dark:[&>button]:!border-slate-700 [&>button]:!rounded-lg [&>button]:!p-2 [&>button]:!shadow-lg [&>button]:!text-slate-600 dark:[&>button]:!text-white [&>button]:hover:!bg-blue-50 dark:[&>button]:hover:!bg-slate-700 [&>button]:hover:!border-blue-200 dark:[&>button]:hover:!border-slate-600 [&>button]:hover:!text-blue-600 dark:[&>button]:hover:!text-blue-400 [&>button]:!transition-all [&>button]:!duration-200 [&>button]:!m-1"
+            showInteractive={false}
+          />
+          {showMiniMap && (
+            <MiniMap
+              className="!bg-white/80 dark:!bg-slate-800/80 !backdrop-blur-sm !border !border-slate-200 dark:!border-slate-700 !rounded-lg !p-1 !shadow-lg"
+              nodeColor={(node) => {
+                switch (node.type) {
+                  case "input":
+                    return "#60A5FA";
+                  case "output":
+                    return "#F472B6";
+                  default:
+                    return "#94A3B8";
+                }
+              }}
+              maskColor="rgba(0, 0, 0, 0.1)"
+              style={{
+                backgroundColor: "transparent",
+                borderRadius: "0.5rem",
+              }}
+              zoomable
+              pannable
+            />
+          )}
           <Toolbar
             onAddNode={addNewNode}
             onDeleteSelected={deleteSelectedNodes}
@@ -348,7 +371,6 @@ export default function Roadmap() {
             showMiniMap={showMiniMap}
             onToggleMiniMap={() => setShowMiniMap(!showMiniMap)}
           />
-
           {selectedNode && activeAction === "edit" && (
             <NodeEditor
               node={selectedNode}
@@ -356,7 +378,6 @@ export default function Roadmap() {
               onClose={closeAction}
             />
           )}
-
           {selectedNode && activeAction === "ai" && (
             <AIAssistant onClose={closeAction} />
           )}
