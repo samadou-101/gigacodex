@@ -43,9 +43,8 @@ const initialNodes: Node<CustomNodeData>[] = [
     position: { x: 250, y: 0 },
     data: {
       label: "HTML & CSS Fundamentals",
-      description: "Learn the basics of web markup and styling",
-      tag: "Frontend",
-      link: "https://developer.mozilla.org/en-US/docs/Web/HTML",
+      description:
+        "Learn the basics of web markup and styling. Understand HTML structure, semantic elements, and CSS properties. Master layout techniques including Flexbox and Grid. Practice responsive design principles and learn to create beautiful, accessible web pages.",
     },
   },
   {
@@ -54,9 +53,8 @@ const initialNodes: Node<CustomNodeData>[] = [
     position: { x: 250, y: 150 },
     data: {
       label: "JavaScript Basics",
-      description: "Master JavaScript fundamentals and ES6+ features",
-      tag: "Frontend",
-      link: "https://developer.mozilla.org/en-US/docs/Web/JavaScript",
+      description:
+        "Master JavaScript fundamentals and ES6+ features. Learn variables, data types, functions, and control flow. Understand objects, arrays, and their methods. Practice DOM manipulation and event handling. Explore modern JavaScript features like arrow functions, destructuring, and async/await.",
     },
   },
   {
@@ -65,9 +63,8 @@ const initialNodes: Node<CustomNodeData>[] = [
     position: { x: 250, y: 300 },
     data: {
       label: "React Fundamentals",
-      description: "Learn React core concepts and hooks",
-      tag: "Frontend",
-      link: "https://react.dev/",
+      description:
+        "Learn React core concepts and hooks. Understand components, props, and state management. Master React hooks like useState, useEffect, and useContext. Practice building interactive UIs and handling forms. Learn about React Router for navigation and state management patterns.",
     },
   },
 ];
@@ -135,6 +132,7 @@ export default function Roadmap() {
     null
   );
   const [showMiniMap, setShowMiniMap] = useState(true);
+  const [activeAction, setActiveAction] = useState<"edit" | "ai" | null>(null);
   const reactFlowWrapper = useRef<HTMLDivElement>(null);
 
   // Update node numbers whenever nodes or edges change
@@ -160,7 +158,20 @@ export default function Roadmap() {
 
   const onNodeClick = useCallback(
     (event: React.MouseEvent, node: Node<CustomNodeData>) => {
-      setSelectedNode(node);
+      // Check if the click was on one of the action buttons
+      const target = event.target as HTMLElement;
+      const button = target.closest("button");
+
+      if (button) {
+        const action = button.getAttribute("data-action");
+        if (action === "edit") {
+          setSelectedNode(node);
+          setActiveAction("edit");
+        } else if (action === "ai") {
+          setSelectedNode(node);
+          setActiveAction("ai");
+        }
+      }
     },
     []
   );
@@ -189,6 +200,7 @@ export default function Roadmap() {
         )
       );
       setSelectedNode(null);
+      setActiveAction(null);
     }
   }, [selectedNode, setNodes, setEdges]);
 
@@ -292,6 +304,11 @@ export default function Roadmap() {
     [nodes, addNodeBetween]
   );
 
+  const closeAction = useCallback(() => {
+    setSelectedNode(null);
+    setActiveAction(null);
+  }, []);
+
   return (
     <div className="h-[calc(100vh-3rem)] w-full bg-gradient-to-br from-slate-50 via-white to-blue-50/30 dark:from-slate-950 dark:via-slate-900 dark:to-blue-950/30">
       {/* Theme Toggle */}
@@ -332,15 +349,17 @@ export default function Roadmap() {
             onToggleMiniMap={() => setShowMiniMap(!showMiniMap)}
           />
 
-          {selectedNode && (
+          {selectedNode && activeAction === "edit" && (
             <NodeEditor
               node={selectedNode}
               onUpdate={updateNode}
-              onClose={() => setSelectedNode(null)}
+              onClose={closeAction}
             />
           )}
 
-          {selectedNode && <AIAssistant />}
+          {selectedNode && activeAction === "ai" && (
+            <AIAssistant onClose={closeAction} />
+          )}
         </ReactFlow>
       </div>
     </div>
