@@ -24,17 +24,17 @@
     "emitDecoratorMetadata": true,
     "baseUrl": ".",
     "paths": {
-      "@/*": ["./*"],
-      "@common/*": ["./common/*"],
-      "@modules/*": ["./modules/*"],
-      "@config/*": ["./common/config/*"],
-      "@utils/*": ["./common/utils/*"],
-      "@middleware/*": ["./common/middleware/*"],
-      "@types/*": ["./common/types/*"],
-      "@auth/*": ["./modules/auth/*"],
-      "@roadmap/*": ["./modules/roadmap/*"],
-      "@quiz/*": ["./modules/quiz/*"],
-      "@blog/*": ["./modules/blog/*"]
+      "@/*": ["./src/*"],
+      "@common/*": ["./src/common/*"],
+      "@modules/*": ["./src/modules/*"],
+      "@config/*": ["./src/common/config/*"],
+      "@utils/*": ["./src/common/utils/*"],
+      "@middleware/*": ["./src/common/middleware/*"],
+      "@types/*": ["./src/common/types/*"],
+      "@auth/*": ["./src/modules/auth/*"],
+      "@roadmap/*": ["./src/modules/roadmap/*"],
+      "@quiz/*": ["./src/modules/quiz/*"],
+      "@blog/*": ["./src/modules/blog/*"]
     }
   },
   "include": ["./**/*"],
