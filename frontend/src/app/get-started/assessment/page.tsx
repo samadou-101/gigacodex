@@ -1,59 +1,28 @@
 "use client";
-import { useState } from "react";
-import { useRouter } from "next/navigation";
-import { questions } from "./assessment-content";
+import { ThemeToggle } from "@/components/ThemeToggle";
 import ProgressBar from "@/components/pages/assessment/ProgressBar";
 import SectionHeader from "@/components/pages/assessment/SectionHeader";
 import Options from "@/components/pages/assessment/Options";
 import NavigationButtons from "@/components/pages/assessment/NavigationButtons";
 import AdditionalInput from "@/components/pages/assessment/AdditionalInput";
-import { ThemeToggle } from "@/components/ThemeToggle";
+import { useAssessmentLogic } from "@/features/assessment/hooks/useAssessmentLogic";
 
 export default function Assessment() {
-  const router = useRouter();
-  const [currentQuestion, setCurrentQuestion] = useState(0);
-  const [answers, setAnswers] = useState<Record<number, string[]>>({});
-  const [selectedOptions, setSelectedOptions] = useState<string[]>([]);
-  const [additionalInput, setAdditionalInput] = useState("");
-  const maxCharacters = 500;
-
-  const handleOptionSelect = (option: string) => {
-    if (questions[currentQuestion].type === "single") {
-      setSelectedOptions([option]);
-    } else {
-      setSelectedOptions((prev) =>
-        prev.includes(option)
-          ? prev.filter((o) => o !== option)
-          : [...prev, option]
-      );
-    }
-  };
-
-  const handleNext = () => {
-    setAnswers((prev) => ({
-      ...prev,
-      [questions[currentQuestion].id]: selectedOptions,
-    }));
-    setSelectedOptions([]);
-    setCurrentQuestion((prev) => prev + 1);
-  };
-
-  const handlePrevious = () => {
-    setCurrentQuestion((prev) => prev - 1);
-    setSelectedOptions(answers[questions[currentQuestion - 1].id] || []);
-  };
-
-  const handleSubmit = () => {
-    // Here you would typically send the answers to your backend
-    console.log("Final answers:", answers);
-    console.log("Additional input:", additionalInput);
-    // Navigate to results page using Next.js router
-    router.push("/get-started/assessment/results");
-  };
-
-  const progress = ((currentQuestion + 1) / questions.length) * 100;
-  const currentSection = questions[currentQuestion].section;
-  const CurrentIcon = questions[currentQuestion].icon;
+  const {
+    currentQuestion,
+    selectedOptions,
+    additionalInput,
+    setAdditionalInput,
+    maxCharacters,
+    handleOptionSelect,
+    handleNext,
+    handlePrevious,
+    handleSubmit,
+    progress,
+    currentSection,
+    CurrentIcon,
+    questions,
+  } = useAssessmentLogic();
 
   // If we're at the last question, show the additional input section
   if (currentQuestion === questions.length - 1) {
