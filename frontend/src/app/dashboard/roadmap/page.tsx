@@ -162,11 +162,6 @@ export default function Roadmap() {
   const [activeAction, setActiveAction] = useState<"edit" | "ai" | null>(null);
   const [saveStatus, setSaveStatus] = useState<"idle" | "success">("idle");
   const reactFlowWrapper = useRef<HTMLDivElement>(null);
-
-  // Update node numbers whenever nodes or edges change
-  // useEffect(() => {
-  //   setNodes((nds) => assignNodeNumbers(nds, edges));
-  // }, [edges, setNodes]);
   useEffect(() => {
     loadRoadmap();
   }, []);
@@ -367,6 +362,9 @@ export default function Roadmap() {
       {/* ReactFlow Canvas */}
       <div className="h-full w-full" ref={reactFlowWrapper}>
         <ReactFlow
+          onInit={(reactFlowInstance) => {
+            reactFlowInstance.fitView({ padding: 0.1 });
+          }}
           nodes={nodes}
           edges={edges}
           onNodesChange={onNodesChange}
