@@ -27,6 +27,7 @@ interface CustomNodeData {
   number?: number;
 }
 
+// Move these outside the component
 const nodeTypes = {
   custom: CustomNode,
 };
@@ -125,6 +126,32 @@ const assignNodeNumbers = (nodes: Node<CustomNodeData>[], edges: Edge[]) => {
   }));
 };
 
+// Utility to ensure loaded nodes are valid
+function sanitizeNodes(nodes: Node<CustomNodeData>[]) {
+  return (nodes || []).map((node) => ({
+    id: node.id || String(Math.random()),
+    type: node.type || "custom",
+    position: node.position || { x: 0, y: 0 },
+    data: {
+      label: node.data?.label || "Untitled",
+      description: node.data?.description || "",
+      tag: node.data?.tag || "",
+      link: node.data?.link || "",
+      // number will be assigned by assignNodeNumbers
+    },
+  }));
+}
+
+function sanitizeEdges(edges: Edge[]) {
+  return (edges || []).map((edge) => ({
+    id: edge.id || `e${edge.source}-${edge.target}`,
+    source: edge.source,
+    target: edge.target,
+    animated: edge.animated ?? true,
+    type: edge.type || "custom",
+  }));
+}
+
 export default function Roadmap() {
   const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
   const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
@@ -133,12 +160,16 @@ export default function Roadmap() {
   );
   const [showMiniMap, setShowMiniMap] = useState(true);
   const [activeAction, setActiveAction] = useState<"edit" | "ai" | null>(null);
+  const [saveStatus, setSaveStatus] = useState<"idle" | "success">("idle");
   const reactFlowWrapper = useRef<HTMLDivElement>(null);
 
   // Update node numbers whenever nodes or edges change
+  // useEffect(() => {
+  //   setNodes((nds) => assignNodeNumbers(nds, edges));
+  // }, [edges, setNodes]);
   useEffect(() => {
-    setNodes((nds) => assignNodeNumbers(nds, edges));
-  }, [edges, setNodes]);
+    loadRoadmap();
+  }, []);
 
   const onConnect = useCallback(
     (params: Connection) => {
@@ -210,14 +241,25 @@ export default function Roadmap() {
       edges,
     };
     localStorage.setItem("roadmap", JSON.stringify(roadmapData));
+    setSaveStatus("success");
   }, [nodes, edges]);
+
+  useEffect(() => {
+    if (saveStatus === "success") {
+      const timeout = setTimeout(() => setSaveStatus("idle"), 2000);
+      return () => clearTimeout(timeout);
+    }
+  }, [saveStatus]);
 
   const loadRoadmap = useCallback(() => {
     const savedRoadmap = localStorage.getItem("roadmap");
     if (savedRoadmap) {
       const { nodes: savedNodes, edges: savedEdges } = JSON.parse(savedRoadmap);
-      setNodes(savedNodes);
-      setEdges(savedEdges);
+      const sanitizedNodes = sanitizeNodes(savedNodes);
+      const sanitizedEdges = sanitizeEdges(savedEdges);
+      const numberedNodes = assignNodeNumbers(sanitizedNodes, sanitizedEdges);
+      setNodes(numberedNodes);
+      setEdges(sanitizedEdges);
     }
   }, [setNodes, setEdges]);
 
@@ -311,6 +353,12 @@ export default function Roadmap() {
 
   return (
     <div className="h-[calc(100vh-3rem)] w-full bg-gradient-to-br from-slate-50 via-white to-blue-50/30 dark:from-slate-950 dark:via-slate-900 dark:to-blue-950/30">
+      {/* Save Feedback Banner */}
+      {saveStatus === "success" && (
+        <div className="fixed top-0 left-1/2 transform -translate-x-1/2 z-50 bg-green-500 text-white px-6 py-2 rounded-b-xl shadow-lg animate-fade-in">
+          Roadmap saved!
+        </div>
+      )}
       {/* Theme Toggle */}
       <div className="fixed top-4 right-4 z-50">
         <ThemeToggle />

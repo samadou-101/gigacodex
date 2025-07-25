@@ -1,6 +1,7 @@
 "use client";
 import { Panel } from "reactflow";
 import { Node } from "reactflow";
+import { useState, useEffect } from "react";
 
 interface CustomNodeData {
   label: string;
@@ -16,6 +17,23 @@ interface NodeEditorProps {
 }
 
 export const NodeEditor = ({ node, onUpdate, onClose }: NodeEditorProps) => {
+  const [label, setLabel] = useState(node.data.label);
+  const [description, setDescription] = useState(node.data.description);
+  const [tag, setTag] = useState(node.data.tag || "");
+  const [link, setLink] = useState(node.data.link || "");
+
+  useEffect(() => {
+    setLabel(node.data.label);
+    setDescription(node.data.description);
+    setTag(node.data.tag || "");
+    setLink(node.data.link || "");
+  }, [node]);
+
+  const handleDone = () => {
+    onUpdate(node.id, { label, description, tag, link });
+    onClose();
+  };
+
   return (
     <Panel
       position="top-right"
@@ -31,8 +49,8 @@ export const NodeEditor = ({ node, onUpdate, onClose }: NodeEditorProps) => {
           </label>
           <input
             type="text"
-            value={node.data.label}
-            onChange={(e) => onUpdate(node.id, { label: e.target.value })}
+            value={label}
+            onChange={(e) => setLabel(e.target.value)}
             className="w-full px-3 py-2 bg-white dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-lg text-slate-900 dark:text-white"
           />
         </div>
@@ -41,8 +59,8 @@ export const NodeEditor = ({ node, onUpdate, onClose }: NodeEditorProps) => {
             Description
           </label>
           <textarea
-            value={node.data.description}
-            onChange={(e) => onUpdate(node.id, { description: e.target.value })}
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
             className="w-full px-3 py-2 bg-white dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-lg text-slate-900 dark:text-white"
             rows={3}
           />
@@ -53,8 +71,8 @@ export const NodeEditor = ({ node, onUpdate, onClose }: NodeEditorProps) => {
           </label>
           <input
             type="text"
-            value={node.data.tag}
-            onChange={(e) => onUpdate(node.id, { tag: e.target.value })}
+            value={tag}
+            onChange={(e) => setTag(e.target.value)}
             className="w-full px-3 py-2 bg-white dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-lg text-slate-900 dark:text-white"
           />
         </div>
@@ -64,14 +82,14 @@ export const NodeEditor = ({ node, onUpdate, onClose }: NodeEditorProps) => {
           </label>
           <input
             type="url"
-            value={node.data.link || ""}
-            onChange={(e) => onUpdate(node.id, { link: e.target.value })}
+            value={link}
+            onChange={(e) => setLink(e.target.value)}
             className="w-full px-3 py-2 bg-white dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-lg text-slate-900 dark:text-white"
             placeholder="https://..."
           />
         </div>
         <button
-          onClick={onClose}
+          onClick={handleDone}
           className="w-full px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors"
         >
           Done
