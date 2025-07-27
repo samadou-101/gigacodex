@@ -1,7 +1,16 @@
 import { Router } from "express";
-import { signup, login, logout } from "./auth.controller.js";
+import { signup, login, logout, getProfile } from "./auth.controller.js";
+import { validateSignup, validateLogin } from "./auth.validator.js";
+import { isAuthenticated, isNotAuthenticated } from "./auth.middleware.js";
+
 const router = Router();
 
-router.post("/signup", signup);
-router.post("/signup", login);
-router.post("/signup", logout);
+// Public routes (no authentication required)
+router.post("/signup", isNotAuthenticated, validateSignup, signup);
+router.post("/login", isNotAuthenticated, validateLogin, login);
+
+// Protected routes (authentication required)
+router.post("/logout", isAuthenticated, logout);
+router.get("/profile", isAuthenticated, getProfile);
+
+export default router;
