@@ -1,5 +1,4 @@
 import { z } from "zod";
-import { Session } from "express-session";
 
 // Signup validation schema
 export const signupSchema = z.object({
