@@ -1,6 +1,6 @@
 # Node modules
 node_modules/
-
+.VSCodeCounter/*
 # Next.js build output
 .next/
 out/

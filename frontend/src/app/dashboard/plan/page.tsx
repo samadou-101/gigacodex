@@ -182,7 +182,8 @@ export default function StudyPlanPage() {
                   </label>
                   <input
                     type="text"
-                    value={newPlan.topics?.join(", ")}
+                    // value={newPlan.topics?.join(", ")}
+                    value={"test"}
                     onChange={(e) =>
                       setNewPlan({
                         ...newPlan,

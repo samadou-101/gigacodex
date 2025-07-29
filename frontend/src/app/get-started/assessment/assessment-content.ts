@@ -5,18 +5,10 @@ import {
   Target,
   Clock,
   Sparkles,
-  LucideIcon,
   BookOpen,
   Rocket,
 } from "lucide-react";
-type Question = {
-  id: number;
-  section: string;
-  question: string;
-  options: string[];
-  type: "single" | "multiple";
-  icon: LucideIcon;
-};
+import { Question } from "@shared/schemas/assessment";
 export const questions: Question[] = [
   // SECTION: Coding Skill Level
   {

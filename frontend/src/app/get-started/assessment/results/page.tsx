@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import {
   ArrowRight,
@@ -14,31 +14,79 @@ import {
 } from "lucide-react";
 import { ThemeToggle } from "@/components/ThemeToggle";
 
-// Mock assessment results - in a real app, this would come from your backend
-const mockResults = {
-  skillLevel: "Intermediate",
-  learningStyle: "Project-Based",
-  goalClarity: "Clear",
-  timeCommitment: "6-10 hours/week",
-  preferredLanguages: ["JavaScript", "Python"],
-  interests: ["Backend Development", "Database Design"],
-  confidenceLevel: 3,
-  insights: [
-    "You have a solid foundation in programming basics",
-    "You're particularly interested in backend development",
-    "You prefer learning through practical projects",
-    "You have good problem-solving skills",
-  ],
+// Get assessment results from localStorage or use mock data as fallback
+const getAssessmentResults = () => {
+  if (typeof window !== "undefined") {
+    const stored = localStorage.getItem("assessmentResults");
+    if (stored) {
+      try {
+        return JSON.parse(stored);
+      } catch (error) {
+        console.error("Error parsing assessment results:", error);
+      }
+    }
+  }
+
+  // Fallback to mock results
+  return {
+    skillLevel: "Intermediate",
+    learningStyle: "Project-Based",
+    goalClarity: "Clear",
+    timeCommitment: "6-10 hours/week",
+    preferredLanguages: ["JavaScript", "Python"],
+    interests: ["Backend Development", "Database Design"],
+    confidenceLevel: 3,
+    insights: [
+      "You have a solid foundation in programming basics",
+      "You're particularly interested in backend development",
+      "You prefer learning through practical projects",
+      "You have good problem-solving skills",
+    ],
+  };
 };
 
 export default function AssessmentResults() {
   const router = useRouter();
   const [isEditing, setIsEditing] = useState(false);
   const [editedGoal, setEditedGoal] = useState("Become a Backend Developer");
+  const [results, setResults] = useState<{
+    skillLevel: string;
+    learningStyle: string;
+    goalClarity: string;
+    timeCommitment: string;
+    preferredLanguages: string[];
+    interests: string[];
+    confidenceLevel: number;
+    insights: string[];
+  } | null>(null);
+
+  // Use useEffect to update results after hydration
+  useEffect(() => {
+    setResults(getAssessmentResults());
+  }, []);
 
   const handleDashboardClick = () => {
     router.push("/dashboard");
   };
+
+  // Show loading state while results are being loaded
+  if (!results) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-blue-50/30 dark:from-slate-950 dark:via-slate-900 dark:to-blue-950/30">
+        <div className="fixed top-4 right-4 z-50">
+          <ThemeToggle />
+        </div>
+        <div className="container mx-auto max-w-4xl px-6 py-12">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600 mx-auto"></div>
+            <p className="mt-4 text-slate-600 dark:text-slate-300">
+              Loading your results...
+            </p>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-blue-50/30 dark:from-slate-950 dark:via-slate-900 dark:to-blue-950/30">
@@ -81,16 +129,14 @@ export default function AssessmentResults() {
                   Current Skill Level
                 </h3>
                 <p className="text-blue-600 dark:text-blue-400 font-medium">
-                  {mockResults.skillLevel}
+                  {results.skillLevel}
                 </p>
               </div>
             </div>
             <div className="space-y-2">
               <div className="flex items-center text-slate-600 dark:text-slate-300">
                 <CheckCircle2 className="w-4 h-4 text-green-500 mr-2" />
-                <span>
-                  Strong in {mockResults.preferredLanguages.join(", ")}
-                </span>
+                <span>Strong in {results.preferredLanguages?.join(", ")}</span>
               </div>
               <div className="flex items-center text-slate-600 dark:text-slate-300">
                 <CheckCircle2 className="w-4 h-4 text-green-500 mr-2" />
@@ -110,7 +156,7 @@ export default function AssessmentResults() {
                   Learning Style
                 </h3>
                 <p className="text-purple-600 dark:text-purple-400 font-medium">
-                  {mockResults.learningStyle}
+                  {results.learningStyle}
                 </p>
               </div>
             </div>
@@ -137,7 +183,7 @@ export default function AssessmentResults() {
                   Time Commitment
                 </h3>
                 <p className="text-green-600 dark:text-green-400 font-medium">
-                  {mockResults.timeCommitment}
+                  {results.timeCommitment}
                 </p>
               </div>
             </div>
@@ -164,7 +210,7 @@ export default function AssessmentResults() {
                   Goal Clarity
                 </h3>
                 <p className="text-orange-600 dark:text-orange-400 font-medium">
-                  {mockResults.goalClarity}
+                  {results.goalClarity}
                 </p>
               </div>
             </div>
@@ -192,7 +238,7 @@ export default function AssessmentResults() {
             </h2>
           </div>
           <div className="space-y-4">
-            {mockResults.insights.map((insight, index) => (
+            {results.insights?.map((insight: string, index: number) => (
               <div
                 key={index}
                 className="flex items-start p-4 bg-slate-50 dark:bg-slate-900/50 rounded-xl"
