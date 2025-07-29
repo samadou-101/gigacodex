@@ -89,21 +89,59 @@ export function useAssessmentLogic() {
       // Submit to backend
       const response = await AssessmentService.submitAssessment(submission);
 
+      console.log("Backend Response:", response);
+      console.log("Response Data:", response.data);
+
       if (response.success && response.data) {
-        // Store results in localStorage or state management
-        localStorage.setItem(
+        console.log("Assessment submitted successfully, redirecting...");
+
+        // Store assessment ID in sessionStorage for immediate use
+        if (response.data.assessmentId) {
+          sessionStorage.setItem(
+            "currentAssessmentId",
+            response.data.assessmentId
+          );
+        }
+
+        // Store results in sessionStorage for immediate access
+        sessionStorage.setItem(
           "assessmentResults",
           JSON.stringify(response.data)
         );
-        router.push("/get-started/assessment/results");
+
+        // Navigate to results page
+        console.log("About to navigate to:", "/get-started/assessment/results");
+
+        // Try different path formats
+        const paths = [
+          "/get-started/assessment/results",
+          "get-started/assessment/results",
+          "/assessment/results",
+          "assessment/results",
+        ];
+
+        for (const path of paths) {
+          try {
+            console.log(`Trying path: ${path}`);
+            router.push(path);
+            console.log(`Navigation successful with path: ${path}`);
+            break;
+          } catch {
+            console.log(`Failed with path: ${path}`);
+          }
+        }
+
+        console.log("Navigation initiated");
+
+        // Don't throw any errors after successful submission
+        return;
       } else {
         console.error("Assessment submission failed:", response.error);
-        // Handle error - show toast or error message
-        alert("Failed to submit assessment. Please try again.");
+        throw new Error(response.error || "Failed to submit assessment");
       }
     } catch (error) {
       console.error("Error submitting assessment:", error);
-      alert("An error occurred while submitting your assessment.");
+      throw error; // Re-throw to let the component handle the loading state
     }
   };
 
@@ -124,7 +162,7 @@ export function useAssessmentLogic() {
     handleOptionSelect,
     handleNext,
     handlePrevious,
-    handleSubmit,
+    handleSubmit: handleSubmit as () => Promise<void>,
     formatAnswersForSubmission,
     createAssessmentSubmission,
     progress,

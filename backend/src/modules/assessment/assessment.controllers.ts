@@ -22,9 +22,70 @@ export const aiController = (req: Request, res: Response) => {
   // For now, return mock results based on assessment data
   const results = generateMockResults(assessment);
 
+  // Generate a unique assessment ID (in production, this would be stored in database)
+  const assessmentId = `assessment_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+
   res.json({
     success: true,
-    data: results,
+    data: {
+      ...results,
+      assessmentId,
+    },
+  });
+};
+
+export const getAssessmentResults = (req: Request, res: Response) => {
+  const { id } = req.params;
+
+  // TODO: In production, fetch from database
+  // For now, return mock results based on the assessment ID
+  const mockResults = {
+    skillLevel: "Intermediate",
+    learningStyle: "Project-Based",
+    goalClarity: "Clear",
+    timeCommitment: "6-10 hours/week",
+    preferredLanguages: ["JavaScript", "Python", "React"],
+    interests: ["Backend Development", "Database Design", "API Development"],
+    confidenceLevel: 3,
+    insights: [
+      "You have a solid foundation in programming basics",
+      "You're particularly interested in backend development",
+      "You prefer learning through practical projects",
+      "You have good problem-solving skills",
+      "Your time commitment will allow for steady progress",
+    ],
+    assessmentId: id,
+    roadmap: {
+      phases: [
+        {
+          phase: 1,
+          title: "Foundation",
+          duration: "4-6 weeks",
+          topics: [
+            "Basic Programming Concepts",
+            "Version Control",
+            "Problem Solving",
+          ],
+        },
+        {
+          phase: 2,
+          title: "Core Skills",
+          duration: "8-12 weeks",
+          topics: ["Web Development", "Database Design", "API Development"],
+        },
+        {
+          phase: 3,
+          title: "Advanced Topics",
+          duration: "6-8 weeks",
+          topics: ["Advanced Frameworks", "Testing", "Deployment"],
+        },
+      ],
+    },
+  };
+
+  res.json({
+    success: true,
+    data: mockResults,
   });
 };
 

@@ -1,6 +1,7 @@
 "use client";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { useQuery } from "@tanstack/react-query";
 import {
   ArrowRight,
   Brain,
@@ -11,66 +12,132 @@ import {
   CheckCircle2,
   Clock,
   Zap,
+  Map,
+  TrendingUp,
+  AlertCircle,
 } from "lucide-react";
 import { ThemeToggle } from "@/components/ThemeToggle";
-
-// Get assessment results from localStorage or use mock data as fallback
-const getAssessmentResults = () => {
-  if (typeof window !== "undefined") {
-    const stored = localStorage.getItem("assessmentResults");
-    if (stored) {
-      try {
-        return JSON.parse(stored);
-      } catch (error) {
-        console.error("Error parsing assessment results:", error);
-      }
-    }
-  }
-
-  // Fallback to mock results
-  return {
-    skillLevel: "Intermediate",
-    learningStyle: "Project-Based",
-    goalClarity: "Clear",
-    timeCommitment: "6-10 hours/week",
-    preferredLanguages: ["JavaScript", "Python"],
-    interests: ["Backend Development", "Database Design"],
-    confidenceLevel: 3,
-    insights: [
-      "You have a solid foundation in programming basics",
-      "You're particularly interested in backend development",
-      "You prefer learning through practical projects",
-      "You have good problem-solving skills",
-    ],
-  };
-};
+import {
+  AssessmentService,
+  AssessmentResultData,
+} from "@/features/assessment/assessment.services";
 
 export default function AssessmentResults() {
   const router = useRouter();
   const [isEditing, setIsEditing] = useState(false);
   const [editedGoal, setEditedGoal] = useState("Become a Backend Developer");
-  const [results, setResults] = useState<{
-    skillLevel: string;
-    learningStyle: string;
-    goalClarity: string;
-    timeCommitment: string;
-    preferredLanguages: string[];
-    interests: string[];
-    confidenceLevel: number;
-    insights: string[];
-  } | null>(null);
+  const [assessmentId, setAssessmentId] = useState<string | null>(null);
+  const [directResults, setDirectResults] =
+    useState<AssessmentResultData | null>(null);
 
-  // Use useEffect to update results after hydration
+  // Get assessment ID from sessionStorage and check for direct results
   useEffect(() => {
-    setResults(getAssessmentResults());
+    const currentAssessmentId = sessionStorage.getItem("currentAssessmentId");
+    if (currentAssessmentId) {
+      setAssessmentId(currentAssessmentId);
+    }
+
+    // Check if we have direct results from the submission
+    const directResultsData = sessionStorage.getItem("assessmentResults");
+    if (directResultsData) {
+      try {
+        const parsed = JSON.parse(directResultsData);
+        setDirectResults(parsed);
+        // Clear the session storage after getting the data
+        sessionStorage.removeItem("assessmentResults");
+      } catch (error) {
+        console.error("Error parsing direct results:", error);
+      }
+    }
   }, []);
+
+  // Fetch assessment results using TanStack Query only if we don't have direct results
+  const {
+    data: fetchedResults,
+    isLoading,
+    error,
+  } = useQuery({
+    queryKey: ["assessmentResults", assessmentId],
+    queryFn: async () => {
+      if (!assessmentId) {
+        throw new Error("No assessment ID found");
+      }
+      const response = await AssessmentService.getAssessmentResults(
+        assessmentId
+      );
+      if (!response.success || !response.data) {
+        throw new Error(response.error || "Failed to fetch assessment results");
+      }
+      return response.data;
+    },
+    enabled: !!assessmentId && !directResults,
+    retry: 1,
+  });
+
+  // Use direct results if available, otherwise use fetched results
+  const results = directResults || fetchedResults;
+
+  // Extract the actual data from the response structure
+  // The backend returns {success: true, data: {...}}, but direct results might be just the data
+  const assessmentData =
+    results && typeof results === "object" && "data" in results
+      ? // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        (results as any).data
+      : (results as AssessmentResultData);
+
+  // Debug: Log the results data
+  useEffect(() => {
+    if (results) {
+      console.log("Assessment Results Data:", results);
+      console.log("Extracted Assessment Data:", assessmentData);
+      console.log("Skill Level:", assessmentData?.skillLevel);
+      console.log("Learning Style:", assessmentData?.learningStyle);
+      console.log("Insights:", assessmentData?.insights);
+      console.log("Roadmap:", assessmentData?.roadmap);
+    }
+  }, [results, assessmentData]);
 
   const handleDashboardClick = () => {
     router.push("/dashboard");
   };
 
+  const handleRetakeAssessment = () => {
+    router.push("/get-started/assessment");
+  };
+
+  // Show error state
+  if (error) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-blue-50/30 dark:from-slate-950 dark:via-slate-900 dark:to-blue-950/30">
+        <div className="fixed top-4 right-4 z-50">
+          <ThemeToggle />
+        </div>
+        <div className="container mx-auto max-w-4xl px-6 py-12">
+          <div className="text-center">
+            <div className="w-32 h-32 bg-red-100 dark:bg-red-900/20 rounded-full flex items-center justify-center mx-auto mb-6">
+              <AlertCircle className="w-16 h-16 text-red-500" />
+            </div>
+            <h1 className="text-3xl font-bold text-slate-900 dark:text-white mb-4">
+              Assessment Results Not Found
+            </h1>
+            <p className="text-lg text-slate-600 dark:text-slate-300 mb-8">
+              {error.message ||
+                "No assessment results found. Please complete the assessment first."}
+            </p>
+            <button
+              onClick={handleRetakeAssessment}
+              className="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-semibold transition-colors duration-300"
+            >
+              Take Assessment Again
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   // Show loading state while results are being loaded
-  if (!results) {
+  if (isLoading || !results) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-blue-50/30 dark:from-slate-950 dark:via-slate-900 dark:to-blue-950/30">
         <div className="fixed top-4 right-4 z-50">
@@ -129,18 +196,27 @@ export default function AssessmentResults() {
                   Current Skill Level
                 </h3>
                 <p className="text-blue-600 dark:text-blue-400 font-medium">
-                  {results.skillLevel}
+                  {assessmentData?.skillLevel}
                 </p>
               </div>
             </div>
             <div className="space-y-2">
               <div className="flex items-center text-slate-600 dark:text-slate-300">
                 <CheckCircle2 className="w-4 h-4 text-green-500 mr-2" />
-                <span>Strong in {results.preferredLanguages?.join(", ")}</span>
+                <span>
+                  Strong in{" "}
+                  {assessmentData?.preferredLanguages?.join(", ") ||
+                    "programming"}
+                </span>
               </div>
               <div className="flex items-center text-slate-600 dark:text-slate-300">
                 <CheckCircle2 className="w-4 h-4 text-green-500 mr-2" />
-                <span>Ready for advanced concepts</span>
+                <span>
+                  Ready for{" "}
+                  {assessmentData?.skillLevel === "Beginner"
+                    ? "basic concepts"
+                    : "advanced concepts"}
+                </span>
               </div>
             </div>
           </div>
@@ -156,7 +232,7 @@ export default function AssessmentResults() {
                   Learning Style
                 </h3>
                 <p className="text-purple-600 dark:text-purple-400 font-medium">
-                  {results.learningStyle}
+                  {assessmentData?.learningStyle}
                 </p>
               </div>
             </div>
@@ -183,7 +259,7 @@ export default function AssessmentResults() {
                   Time Commitment
                 </h3>
                 <p className="text-green-600 dark:text-green-400 font-medium">
-                  {results.timeCommitment}
+                  {assessmentData?.timeCommitment}
                 </p>
               </div>
             </div>
@@ -210,7 +286,7 @@ export default function AssessmentResults() {
                   Goal Clarity
                 </h3>
                 <p className="text-orange-600 dark:text-orange-400 font-medium">
-                  {results.goalClarity}
+                  {assessmentData?.goalClarity}
                 </p>
               </div>
             </div>
@@ -238,7 +314,7 @@ export default function AssessmentResults() {
             </h2>
           </div>
           <div className="space-y-4">
-            {results.insights?.map((insight: string, index: number) => (
+            {assessmentData?.insights?.map((insight: string, index: number) => (
               <div
                 key={index}
                 className="flex items-start p-4 bg-slate-50 dark:bg-slate-900/50 rounded-xl"
@@ -251,6 +327,66 @@ export default function AssessmentResults() {
             ))}
           </div>
         </div>
+
+        {/* Learning Roadmap */}
+        {assessmentData?.roadmap && (
+          <div className="bg-white/60 dark:bg-slate-800/60 backdrop-blur-sm rounded-2xl border border-slate-200/50 dark:border-slate-700/50 p-8 mb-12">
+            <div className="flex items-center mb-6">
+              <div className="w-12 h-12 bg-gradient-to-br from-emerald-500 to-teal-500 rounded-xl flex items-center justify-center mr-4">
+                <Map className="h-6 w-6 text-white" />
+              </div>
+              <h2 className="text-2xl font-bold text-slate-900 dark:text-white">
+                Your Learning Roadmap
+              </h2>
+            </div>
+            <div className="space-y-6">
+              {assessmentData.roadmap.phases?.map(
+                (phase: {
+                  phase: number;
+                  title: string;
+                  duration: string;
+                  topics: string[];
+                }) => (
+                  <div
+                    key={phase.phase}
+                    className="relative p-6 bg-slate-50 dark:bg-slate-900/50 rounded-xl border-l-4 border-emerald-500"
+                  >
+                    <div className="flex items-center justify-between mb-4">
+                      <div className="flex items-center">
+                        <div className="w-8 h-8 bg-emerald-500 rounded-full flex items-center justify-center mr-3">
+                          <span className="text-white font-bold text-sm">
+                            {phase.phase}
+                          </span>
+                        </div>
+                        <h3 className="text-lg font-semibold text-slate-900 dark:text-white">
+                          {phase.title}
+                        </h3>
+                      </div>
+                      <span className="text-sm text-emerald-600 dark:text-emerald-400 font-medium">
+                        {phase.duration}
+                      </span>
+                    </div>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                      {phase.topics?.map(
+                        (topic: string, topicIndex: number) => (
+                          <div
+                            key={topicIndex}
+                            className="flex items-center p-3 bg-white/60 dark:bg-slate-800/60 rounded-lg"
+                          >
+                            <TrendingUp className="w-4 h-4 text-emerald-500 mr-2" />
+                            <span className="text-slate-700 dark:text-slate-300">
+                              {topic}
+                            </span>
+                          </div>
+                        )
+                      )}
+                    </div>
+                  </div>
+                )
+              )}
+            </div>
+          </div>
+        )}
 
         {/* Goal Confirmation */}
         <div className="bg-white/60 dark:bg-slate-800/60 backdrop-blur-sm rounded-2xl border border-slate-200/50 dark:border-slate-700/50 p-8 mb-12">

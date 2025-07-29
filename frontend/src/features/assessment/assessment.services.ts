@@ -2,19 +2,29 @@ import { AssessmentSubmission } from "@shared/schemas/assessment";
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000";
 
+export interface AssessmentResultData {
+  skillLevel: string;
+  learningStyle: string;
+  goalClarity: string;
+  timeCommitment: string;
+  preferredLanguages: string[];
+  interests: string[];
+  confidenceLevel: number;
+  insights: string[];
+  assessmentId?: string;
+  roadmap?: {
+    phases: Array<{
+      phase: number;
+      title: string;
+      duration: string;
+      topics: string[];
+    }>;
+  };
+}
+
 export interface AssessmentResponse {
   success: boolean;
-  data?: {
-    skillLevel: string;
-    learningStyle: string;
-    goalClarity: string;
-    timeCommitment: string;
-    preferredLanguages: string[];
-    interests: string[];
-    confidenceLevel: number;
-    insights: string[];
-    roadmap?: Record<string, unknown>;
-  };
+  data?: AssessmentResultData;
   error?: string;
 }
 

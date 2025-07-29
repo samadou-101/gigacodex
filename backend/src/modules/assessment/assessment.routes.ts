@@ -1,6 +1,10 @@
 import Router from "express";
 import { validateAssessment } from "./assessment.middleware.js";
-import { generateAIPrompt, aiController } from "./assessment.controllers.js";
+import {
+  generateAIPrompt,
+  aiController,
+  getAssessmentResults,
+} from "./assessment.controllers.js";
 
 const assessmentRouter = Router();
 
@@ -13,9 +17,6 @@ assessmentRouter.post(
 );
 
 // Get assessment results by ID
-assessmentRouter.get("/results/:id", (req, res) => {
-  // TODO: Implement get results by ID
-  res.json({ message: "Get results by ID - not implemented yet" });
-});
+assessmentRouter.get("/results/:id", getAssessmentResults);
 
 export default assessmentRouter;
