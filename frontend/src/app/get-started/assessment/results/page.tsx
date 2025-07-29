@@ -1,6 +1,6 @@
 "use client";
 import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
 import {
   ArrowRight,
@@ -24,6 +24,7 @@ import {
 
 export default function AssessmentResults() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [isEditing, setIsEditing] = useState(false);
   const [editedGoal, setEditedGoal] = useState("Become a Backend Developer");
   const [assessmentId, setAssessmentId] = useState<string | null>(null);
@@ -35,6 +36,11 @@ export default function AssessmentResults() {
     const currentAssessmentId = sessionStorage.getItem("currentAssessmentId");
     if (currentAssessmentId) {
       setAssessmentId(currentAssessmentId);
+    } else {
+      const assessmentIdFromParams = searchParams.get("assessmentId");
+      if (assessmentIdFromParams) {
+        setAssessmentId(assessmentIdFromParams);
+      }
     }
 
     // Check if we have direct results from the submission
@@ -43,15 +49,14 @@ export default function AssessmentResults() {
       try {
         const parsed = JSON.parse(directResultsData);
         setDirectResults(parsed);
-        // Clear the session storage after getting the data
-        sessionStorage.removeItem("assessmentResults");
+        // Don't clear session storage immediately - keep it for potential refresh
       } catch (error) {
         console.error("Error parsing direct results:", error);
       }
     }
-  }, []);
+  }, [searchParams]);
 
-  // Fetch assessment results using TanStack Query only if we don't have direct results
+  // Fetch assessment results using TanStack Query
   const {
     data: fetchedResults,
     isLoading,
@@ -71,7 +76,9 @@ export default function AssessmentResults() {
       return response.data;
     },
     enabled: !!assessmentId && !directResults,
-    retry: 1,
+    retry: 2,
+    staleTime: 5 * 60 * 1000, // 5 minutes
+    gcTime: 10 * 60 * 1000, // 10 minutes
   });
 
   // Use direct results if available, otherwise use fetched results
@@ -96,6 +103,15 @@ export default function AssessmentResults() {
       console.log("Roadmap:", assessmentData?.roadmap);
     }
   }, [results, assessmentData]);
+
+  // Clear session storage only after successful data extraction
+  useEffect(() => {
+    if (assessmentData && directResults) {
+      // Clear session storage after we've successfully extracted the data
+      sessionStorage.removeItem("assessmentResults");
+      console.log("Cleared session storage after successful data extraction");
+    }
+  }, [assessmentData, directResults]);
 
   const handleDashboardClick = () => {
     router.push("/dashboard");
@@ -124,12 +140,20 @@ export default function AssessmentResults() {
               {error.message ||
                 "No assessment results found. Please complete the assessment first."}
             </p>
-            <button
-              onClick={handleRetakeAssessment}
-              className="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-semibold transition-colors duration-300"
-            >
-              Take Assessment Again
-            </button>
+            <div className="space-y-4">
+              <button
+                onClick={handleRetakeAssessment}
+                className="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-semibold transition-colors duration-300 mr-4"
+              >
+                Take Assessment Again
+              </button>
+              <button
+                onClick={() => window.location.reload()}
+                className="px-6 py-3 bg-gray-600 hover:bg-gray-700 text-white rounded-xl font-semibold transition-colors duration-300"
+              >
+                Refresh Page
+              </button>
+            </div>
           </div>
         </div>
       </div>
@@ -149,6 +173,11 @@ export default function AssessmentResults() {
             <p className="mt-4 text-slate-600 dark:text-slate-300">
               Loading your results...
             </p>
+            {!assessmentId && (
+              <p className="mt-2 text-sm text-slate-500 dark:text-slate-400">
+                No assessment ID found. Please complete the assessment first.
+              </p>
+            )}
           </div>
         </div>
       </div>

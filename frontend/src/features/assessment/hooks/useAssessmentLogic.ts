@@ -106,6 +106,7 @@ export function useAssessmentLogic() {
             "currentAssessmentId",
             response.data.assessmentId
           );
+          console.log("Stored assessment ID:", response.data.assessmentId);
         }
 
         // Store results in sessionStorage for immediate access
@@ -113,16 +114,18 @@ export function useAssessmentLogic() {
           "assessmentResults",
           JSON.stringify(response.data)
         );
+        console.log("Stored assessment results in sessionStorage");
 
         // Navigate to results page
         console.log("About to navigate to:", "/get-started/assessment/results");
 
-        // Try different path formats
+        // Try different path formats with assessment ID in URL
+        const assessmentId = response.data.assessmentId;
         const paths = [
-          "/get-started/assessment/results",
-          "get-started/assessment/results",
-          "/assessment/results",
-          "assessment/results",
+          `/get-started/assessment/results?assessmentId=${assessmentId}`,
+          `/get-started/assessment/results?assessmentId=${assessmentId}`,
+          `/assessment/results?assessmentId=${assessmentId}`,
+          `/assessment/results?assessmentId=${assessmentId}`,
         ];
 
         for (const path of paths) {
