@@ -16,6 +16,7 @@
     "@reactflow/node-resizer": "^2.2.14",
     "@reduxjs/toolkit": "^2.8.2",
     "@tanstack/react-query": "^5.83.0",
+    "axios": "^1.11.0",
     "clsx": "^2.1.1",
     "framer-motion": "^12.17.0",
     "frontend": "file:",

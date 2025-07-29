@@ -5,7 +5,7 @@ import {
   AssessmentAnswer,
   AssessmentSubmission,
 } from "@shared/schemas/assessment";
-import { AssessmentService } from "../assessment.services";
+import { AssessmentService } from "../services";
 
 export function useAssessmentLogic() {
   const router = useRouter();
@@ -85,6 +85,11 @@ export function useAssessmentLogic() {
         preferredTrack: "frontend", // This should come from a form
         otherNotes: additionalInput,
       });
+
+      console.log(
+        "Complete submission object:",
+        JSON.stringify(submission, null, 2)
+      );
 
       // Submit to backend
       const response = await AssessmentService.submitAssessment(submission);

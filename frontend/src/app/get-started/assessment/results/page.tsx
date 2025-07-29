@@ -20,7 +20,7 @@ import { ThemeToggle } from "@/components/ThemeToggle";
 import {
   AssessmentService,
   AssessmentResultData,
-} from "@/features/assessment/assessment.services";
+} from "@/features/assessment/services";
 
 export default function AssessmentResults() {
   const router = useRouter();
