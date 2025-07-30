@@ -1,10 +1,10 @@
 "use client";
 import { ThemeToggle } from "@/components/ThemeToggle";
-import ProgressBar from "@/components/pages/assessment/ProgressBar";
-import SectionHeader from "@/components/pages/assessment/SectionHeader";
-import Options from "@/components/pages/assessment/Options";
-import NavigationButtons from "@/components/pages/assessment/NavigationButtons";
-import AdditionalInput from "@/components/pages/assessment/AdditionalInput";
+import ProgressBar from "@/features/assessment/components/ProgressBar";
+import SectionHeader from "@/features/assessment/components/SectionHeader";
+import Options from "@/features/assessment/components/Options";
+import NavigationButtons from "@/features/assessment/components/NavigationButtons";
+import AdditionalInput from "@/features/assessment/components/AdditionalInput";
 import { useAssessmentLogic } from "@/features/assessment/hooks/useAssessmentLogic";
 
 export default function Assessment() {

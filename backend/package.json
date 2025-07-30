@@ -16,6 +16,7 @@
     "test-db": "node scripts/test-db-connection.js"
   },
   "dependencies": {
+    "@google/genai": "^1.11.0",
     "@prisma/client": "^6.8.2",
     "bcrypt": "^6.0.0",
     "connect-pg-simple": "^10.0.0",
