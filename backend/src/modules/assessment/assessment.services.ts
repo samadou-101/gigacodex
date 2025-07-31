@@ -37,16 +37,17 @@ Additional Notes: ${otherNotes || "None"}
 Assessment Answers:
 ${answersText}
 
-Given the user's profile and assessment answers below, return only:
-insights: brief, helpful feedback for the user (max 3 short points)
-roadmap: a structured JSON object with 3–5 steps tailored to the user’s current level, goals, time availability, and preferred track. Each step should include:
-title
-description
-durationEstimate (in weeks)
-the response should be short without a lot of talking becasue it will be formatted and represented on a results page
+ insights: brief, helpful feedback for the user (max 3 short points)
+ roadmap: 3-5 steps
   `.trim();
 }
 
+// Given the user's profile and assessment answers below, return only:
+// roadmap: a structured JSON object with 3–5 steps tailored to the user’s current level, goals, time availability, and preferred track. Each step should include:
+// title
+// description
+// durationEstimate (in weeks)
+// the response should be short without a lot of talking becasue it will be formatted and represented on a results page
 export function formatAIResponse(rawText: string | undefined) {
   if (!rawText) return {};
 

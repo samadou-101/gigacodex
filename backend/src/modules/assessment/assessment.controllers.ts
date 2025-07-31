@@ -1,4 +1,4 @@
-import { Request, Response, NextFunction } from "express";
+import { Request, Response, NextFunction, response } from "express";
 import {
   generatePromptFromAssessment,
   generateMockResults,
@@ -26,7 +26,7 @@ export const aiController = async (req: Request, res: Response) => {
   // TODO: Integrate with actual AI service
 
   const aiResult = await getGeminiAIResponse(prompt);
-  const formatted = formatAIResponse(aiResult.text!);
+  // const formatted = formatAIResponse(aiResult.text!);
   // console.log("test before ai result");
   console.log(aiResult.text);
   // For now, return mock results based on assessment data
@@ -40,7 +40,7 @@ export const aiController = async (req: Request, res: Response) => {
     data: {
       assessmentId,
       // aiResult,
-      formatted,
+      aiResult,
     },
   });
 };
