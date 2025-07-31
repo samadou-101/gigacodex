@@ -100,27 +100,33 @@ export function useAssessmentLogic() {
       if (response.success && response.data) {
         console.log("Assessment submitted successfully, redirecting...");
 
-        // Store assessment ID in sessionStorage for immediate use
+        // Store assessment ID in localStorage for immediate use
         if (response.data.assessmentId) {
-          sessionStorage.setItem(
+          localStorage.setItem(
             "currentAssessmentId",
             response.data.assessmentId
           );
           console.log("Stored assessment ID:", response.data.assessmentId);
         }
 
-        // Store results in sessionStorage for immediate access
-        sessionStorage.setItem(
+        // Store results in localStorage for immediate access
+        localStorage.setItem(
           "assessmentResults",
           JSON.stringify(response.data)
         );
-        console.log("Stored assessment results in sessionStorage");
+        console.log("Stored assessment results in localStorage");
 
         // Navigate to results page
         console.log("About to navigate to:", "/get-started/assessment/results");
 
         // Try different path formats with assessment ID in URL
         const assessmentId = response.data.assessmentId;
+        // const paths = [
+        //   `/get-started/assessment/results?assessmentId=${assessmentId}`,
+        //   `/get-started/assessment/results?assessmentId=${assessmentId}`,
+        //   `/assessment/results?assessmentId=${assessmentId}`,
+        //   `/assessment/results?assessmentId=${assessmentId}`,
+        // ];
         const paths = [
           `/get-started/assessment/results?assessmentId=${assessmentId}`,
           `/get-started/assessment/results?assessmentId=${assessmentId}`,

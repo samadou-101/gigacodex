@@ -6,7 +6,6 @@ import {
   ArrowRight,
   Brain,
   Code2,
-  Compass,
   Target,
   Sparkles,
   CheckCircle2,
@@ -25,8 +24,8 @@ import {
 export default function AssessmentResults() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const [isEditing, setIsEditing] = useState(false);
-  const [editedGoal, setEditedGoal] = useState("Become a Backend Developer");
+  // const [isEditing, setIsEditing] = useState(false);
+  // const [editedGoal, setEditedGoal] = useState("Become a Backend Developer");
   const [assessmentId, setAssessmentId] = useState<string | null>(null);
   const [directResults, setDirectResults] =
     useState<AssessmentResultData | null>(null);
@@ -44,7 +43,7 @@ export default function AssessmentResults() {
     }
 
     // Check if we have direct results from the submission
-    const directResultsData = sessionStorage.getItem("assessmentResults");
+    const directResultsData = localStorage.getItem("assessmentResults");
     if (directResultsData) {
       try {
         const parsed = JSON.parse(directResultsData);
@@ -77,8 +76,8 @@ export default function AssessmentResults() {
     },
     enabled: !!assessmentId && !directResults,
     retry: 2,
-    staleTime: 5 * 60 * 1000, // 5 minutes
-    gcTime: 10 * 60 * 1000, // 10 minutes
+    staleTime: 5 * 60 * 1000,
+    gcTime: 10 * 60 * 1000,
   });
 
   // Use direct results if available, otherwise use fetched results
@@ -105,13 +104,12 @@ export default function AssessmentResults() {
   }, [results, assessmentData]);
 
   // Clear session storage only after successful data extraction
-  useEffect(() => {
-    if (assessmentData && directResults) {
-      // Clear session storage after we've successfully extracted the data
-      sessionStorage.removeItem("assessmentResults");
-      console.log("Cleared session storage after successful data extraction");
-    }
-  }, [assessmentData, directResults]);
+  // useEffect(() => {
+  //   if (assessmentData && directResults) {
+  //     sessionStorage.removeItem("assessmentResults");
+  //     console.log("Cleared session storage after successful data extraction");
+  //   }
+  // }, [assessmentData, directResults]);
 
   const handleDashboardClick = () => {
     router.push("/dashboard");
@@ -343,17 +341,21 @@ export default function AssessmentResults() {
             </h2>
           </div>
           <div className="space-y-4">
-            {assessmentData?.insights?.map((insight: string, index: number) => (
-              <div
-                key={index}
-                className="flex items-start p-4 bg-slate-50 dark:bg-slate-900/50 rounded-xl"
-              >
-                <div className="w-6 h-6 bg-gradient-to-br from-blue-500 to-indigo-500 rounded-full flex items-center justify-center mr-3 mt-1">
-                  <CheckCircle2 className="w-4 h-4 text-white" />
+            {assessmentData?.insights?.map(
+              (insight: { title: string; content: string }, index: number) => (
+                <div
+                  key={index}
+                  className="flex items-start p-4 bg-slate-50 dark:bg-slate-900/50 rounded-xl"
+                >
+                  <div className="w-6 h-6 bg-gradient-to-br from-blue-500 to-indigo-500 rounded-full flex items-center justify-center mr-3 mt-1">
+                    <CheckCircle2 className="w-4 h-4 text-white" />
+                  </div>
+                  <p className="text-slate-700 dark:text-slate-300">
+                    {insight?.content}
+                  </p>
                 </div>
-                <p className="text-slate-700 dark:text-slate-300">{insight}</p>
-              </div>
-            ))}
+              )
+            )}
           </div>
         </div>
 
@@ -369,46 +371,44 @@ export default function AssessmentResults() {
               </h2>
             </div>
             <div className="space-y-6">
-              {assessmentData.roadmap.phases?.map(
-                (phase: {
-                  phase: number;
-                  title: string;
-                  duration: string;
-                  topics: string[];
-                }) => (
+              {assessmentData.roadmap.map(
+                (
+                  step: {
+                    description: string;
+                    durationEstimate: number;
+                    title: string;
+                  },
+                  index: number
+                ) => (
                   <div
-                    key={phase.phase}
+                    key={index}
                     className="relative p-6 bg-slate-50 dark:bg-slate-900/50 rounded-xl border-l-4 border-emerald-500"
                   >
                     <div className="flex items-center justify-between mb-4">
                       <div className="flex items-center">
                         <div className="w-8 h-8 bg-emerald-500 rounded-full flex items-center justify-center mr-3">
                           <span className="text-white font-bold text-sm">
-                            {phase.phase}
+                            {index + 1}
                           </span>
                         </div>
                         <h3 className="text-lg font-semibold text-slate-900 dark:text-white">
-                          {phase.title}
+                          {step.title}
                         </h3>
                       </div>
-                      <span className="text-sm text-emerald-600 dark:text-emerald-400 font-medium">
-                        {phase.duration}
-                      </span>
+                      {/* <span className="text-sm text-emerald-600 dark:text-emerald-400 font-medium">
+                        {step.durationEstimate}
+                      </span> */}
                     </div>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                      {phase.topics?.map(
-                        (topic: string, topicIndex: number) => (
-                          <div
-                            key={topicIndex}
-                            className="flex items-center p-3 bg-white/60 dark:bg-slate-800/60 rounded-lg"
-                          >
-                            <TrendingUp className="w-4 h-4 text-emerald-500 mr-2" />
-                            <span className="text-slate-700 dark:text-slate-300">
-                              {topic}
-                            </span>
-                          </div>
-                        )
-                      )}
+                    <div className="grid grid-cols-1 md:grid-cols-1 ">
+                      <div
+                        key={index}
+                        className="flex items-center gap-x-4 bg-white/60 dark:bg-slate-800/60 rounded-lg"
+                      >
+                        <TrendingUp className="w-8 h-8 text-emerald-500 mr-2" />
+                        <span className="text-slate-700 dark:text-slate-300">
+                          {step.description}
+                        </span>
+                      </div>
                     </div>
                   </div>
                 )
@@ -418,7 +418,7 @@ export default function AssessmentResults() {
         )}
 
         {/* Goal Confirmation */}
-        <div className="bg-white/60 dark:bg-slate-800/60 backdrop-blur-sm rounded-2xl border border-slate-200/50 dark:border-slate-700/50 p-8 mb-12">
+        {/* <div className="bg-white/60 dark:bg-slate-800/60 backdrop-blur-sm rounded-2xl border border-slate-200/50 dark:border-slate-700/50 p-8 mb-12">
           <div className="flex items-center justify-between mb-6">
             <div className="flex items-center">
               <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-indigo-500 rounded-xl flex items-center justify-center mr-4">
@@ -447,7 +447,7 @@ export default function AssessmentResults() {
               {editedGoal}
             </p>
           )}
-        </div>
+        </div> */}
 
         {/* CTA Button */}
         <div className="text-center">
