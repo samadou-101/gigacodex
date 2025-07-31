@@ -20,28 +20,14 @@ export const generateAIPrompt = (
 };
 
 export const aiController = async (req: Request, res: Response) => {
-  const assessment: Assessment = req.body;
+  // const assessment: Assessment = req.body;
   const prompt = req.body.prompt;
-
-  // TODO: Integrate with actual AI service
-
-  const aiResult = await getGeminiAIResponse(prompt);
-  // const formatted = formatAIResponse(aiResult.text!);
-  // console.log("test before ai result");
-  console.log(aiResult.text);
-  // For now, return mock results based on assessment data
-  const results = generateMockResults(assessment);
-
-  // Generate a unique assessment ID (in production, this would be stored in database)
+  const data = await getGeminiAIResponse(prompt);
   const assessmentId = `assessment_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-  // console.log(prompt);
   res.json({
     success: true,
-    data: {
-      assessmentId,
-      // aiResult,
-      aiResult,
-    },
+    assessmentId,
+    data,
   });
 };
 

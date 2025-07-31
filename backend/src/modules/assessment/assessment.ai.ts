@@ -28,14 +28,14 @@ export async function getGeminiAIResponse(prompt: string) {
             items: {
               type: Type.OBJECT,
               properties: {
-                insightTitle: {
+                title: {
                   type: Type.STRING,
                 },
-                insightContent: {
+                content: {
                   type: Type.STRING,
                 },
               },
-              required: ["insightTitle", "insightContent"],
+              required: ["title", "content"],
             },
           },
           roadmap: {
