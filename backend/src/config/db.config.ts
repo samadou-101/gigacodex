@@ -3,7 +3,7 @@ dotenv.config();
 import { PrismaClient } from "@prisma/client";
 
 // Database configuration for localhost PostgreSQL
-const DATABASE_URL = process.env.DATABASE_URL;
+const DIRECT_URL = process.env.DIRECT_URL;
 // ||
 // "postgresql://postgres:mossabdo2002@localhost:5432/gigacodex_dev";
 
@@ -11,7 +11,7 @@ const DATABASE_URL = process.env.DATABASE_URL;
 const prisma = new PrismaClient({
   datasources: {
     db: {
-      url: process.env.DATABASE_URL,
+      url: process.env.DIRECT_URL,
     },
   },
   log: [
@@ -24,17 +24,17 @@ const prisma = new PrismaClient({
 
 // Test database connection
 export async function testDatabaseConnection() {
-  console.log(process.env.DATABASE_URL);
+  console.log(process.env.DIRECT_URL);
   try {
     await prisma.$connect();
-    console.log("✅ Database connected successfully to:", DATABASE_URL);
+    console.log("✅ Database connected successfully to:", DIRECT_URL);
     return true;
   } catch (error) {
     console.error("❌ Database connection failed:", error);
     console.log("Please check your PostgreSQL connection:");
     console.log("1. Make sure PostgreSQL is running on localhost:5432");
     console.log("2. Create database: CREATE DATABASE gigacodex_db;");
-    console.log("3. Update DATABASE_URL in your .env file if needed");
+    console.log("3. Update DIRECT_URL in your .env file if needed");
     return false;
   }
 }

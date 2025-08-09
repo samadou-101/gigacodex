@@ -1,6 +1,8 @@
 datasource db {
   provider = "postgresql"
-  url      = env("DATABASE_URL")
+//  url      = env("DATABASE_URL")
+//  url      = env("PRODUCTION_DB_URL")
+  url  = env("DIRECT_URL")
 }
 
 generator client {
@@ -15,4 +17,12 @@ model User {
   password  String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  roadmap Roadmap?
 } 
+
+model Roadmap {
+  id Int @id @default(autoincrement())
+  user User @relation(fields: [userId], references: [id])
+  userId Int @unique
+  roadmap_data Json 
+}

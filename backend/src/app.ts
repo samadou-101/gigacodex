@@ -8,6 +8,7 @@ import session from "express-session";
 import sessionConfig from "./config/session.config.js";
 import authRoutes from "./modules/auth/auth.routes.js";
 import assessmentRouter from "./modules/assessment/assessment.routes.js";
+import roadmapRouter from "./modules/roadmap/routes/roadmap.route.js";
 
 const app = express();
 
@@ -29,6 +30,7 @@ app.use(session(sessionConfig));
 // Routes
 app.use("/api/auth", authRoutes);
 app.use("/api/assessment", assessmentRouter);
+app.use("/api/roadmap", roadmapRouter);
 app.get("/", (req, res) => {
   res.send("Welcome");
 });

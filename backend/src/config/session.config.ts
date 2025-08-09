@@ -4,7 +4,7 @@ import session from "express-session";
 import pgSimple from "connect-pg-simple";
 import { Pool } from "pg";
 
-// Parse DATABASE_URL to extract components
+// Parse DIRECT_URL to extract components
 const parseDatabaseUrl = (url: string) => {
   try {
     const parsed = new URL(url);
@@ -14,35 +14,34 @@ const parseDatabaseUrl = (url: string) => {
       database: parsed.pathname.slice(1),
       user: parsed.username,
       password: parsed.password,
-      ssl:
-        process.env.NODE_ENV === "production"
-          ? { rejectUnauthorized: false }
-          : false,
+      ssl: { require: true, rejectUnauthorized: false },
+      prepare: false,
     };
   } catch (error) {
-    console.error("❌ Invalid DATABASE_URL format:", error);
-    throw new Error("Invalid DATABASE_URL format");
+    console.error("❌ Invalid DIRECT_URL format:", error);
+    throw new Error("Invalid DIRECT_URL format");
   }
 };
 
 // Create PostgreSQL connection pool for session store
 const createPool = () => {
-  const DATABASE_URL = process.env.DATABASE_URL;
+  const DIRECT_URL = process.env.DIRECT_URL;
 
-  if (!DATABASE_URL) {
-    throw new Error("DATABASE_URL environment variable is required");
+  if (!DIRECT_URL) {
+    throw new Error("DIRECT_URL environment variable is required");
   }
 
-  console.log("🔗 Connecting to PostgreSQL for session storage...");
+  console.log("🔗 Connecting to PostgreSQL for session storage...", DIRECT_URL);
 
   try {
-    const config = parseDatabaseUrl(DATABASE_URL);
+    const config = parseDatabaseUrl(DIRECT_URL);
+    console.log("Parsed Config:", config); // Debug parsed config
 
     return new Pool({
       ...config,
-      max: 20, // Maximum number of clients in the pool
+      max: 10, // Reduced to avoid Supabase limits
       idleTimeoutMillis: 30000, // Close idle clients after 30 seconds
-      connectionTimeoutMillis: 2000, // Return an error after 2 seconds if connection could not be established
+      connectionTimeoutMillis: 5000, // Error after 5 seconds if connection fails
     });
   } catch (error) {
     console.error("❌ Failed to create database pool:", error);
@@ -67,8 +66,8 @@ const PostgresStore = pgSimple(session);
 // Session store configuration
 const sessionStore = new PostgresStore({
   pool,
-  tableName: "sessions", // Table name for storing sessions
-  createTableIfMissing: true, // Automatically create sessions table
+  tableName: "session", // Table name for storing sessions
+  createTableIfMissing: false, // Disabled; create table manually in Supabase
   pruneSessionInterval: 60, // Clean up expired sessions every 60 seconds
 });
 
@@ -79,7 +78,7 @@ export const sessionConfig = {
   resave: false,
   saveUninitialized: false,
   cookie: {
-    secure: process.env.NODE_ENV === "production", // Use secure cookies in production
+    secure: process.env.NODE_ENV === "production", // Secure cookies in production
     httpOnly: true,
     maxAge: 24 * 60 * 60 * 1000, // 24 hours
     sameSite: "lax" as const,
@@ -87,7 +86,7 @@ export const sessionConfig = {
   name: "sid", // Session cookie name
 };
 
-// Clean up expired sessions (optional)
+// Clean up expired sessions
 export const cleanupExpiredSessions = async () => {
   try {
     const result = await pool.query(

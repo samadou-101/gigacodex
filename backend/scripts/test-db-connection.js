@@ -6,27 +6,27 @@ import dotenv from "dotenv";
 dotenv.config();
 
 async function testDatabaseConnection() {
-  const DATABASE_URL = process.env.DATABASE_URL;
+  const DIRECT_URL = process.env.DIRECT_URL;
 
-  if (!DATABASE_URL) {
-    console.error("❌ DATABASE_URL environment variable is not set");
+  if (!DIRECT_URL) {
+    console.error("❌ DIRECT_URL environment variable is not set");
     console.log("Please create a .env file with:");
     console.log(
-      'DATABASE_URL="postgresql://username:password@localhost:5432/database_name"'
+      'DIRECT_URL="postgresql://username:password@localhost:5432/database_name"'
     );
     process.exit(1);
   }
 
   console.log("🔍 Testing database connection...");
   console.log(
-    "📝 DATABASE_URL:",
-    DATABASE_URL.replace(/\/\/[^:]+:[^@]+@/, "//***:***@")
+    "📝 DIRECT_URL:",
+    DIRECT_URL.replace(/\/\/[^:]+:[^@]+@/, "//***:***@")
   ); // Hide password
 
-  // Parse DATABASE_URL
+  // Parse DIRECT_URL
   let config;
   try {
-    const parsed = new URL(DATABASE_URL);
+    const parsed = new URL(DIRECT_URL);
     config = {
       host: parsed.hostname,
       port: parseInt(parsed.port) || 5432,
@@ -36,7 +36,7 @@ async function testDatabaseConnection() {
       ssl: false,
     };
   } catch (error) {
-    console.error("❌ Invalid DATABASE_URL format:", error.message);
+    console.error("❌ Invalid DIRECT_URL format:", error.message);
     process.exit(1);
   }
 
