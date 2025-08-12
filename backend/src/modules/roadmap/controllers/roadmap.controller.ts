@@ -16,9 +16,16 @@ export const roadmapSavingController = async (req: Request, res: Response) => {
         roadmapData
       );
 
-      res.status(200).json({ message: "saved roadmap!" });
+      res.status(200).json({ roadmap: savedRoadmap });
     }
   } catch (error) {
     res.status(500).json({ message: "Unexpected Error!" });
   }
+};
+
+export const roadmapLoadingController = async (req: Request, rse: Response) => {
+  try {
+    const userId = req.session.user?.id;
+    const roadmapData = RoadmapService.loadRoadmap(userId);
+  } catch (error) {}
 };
