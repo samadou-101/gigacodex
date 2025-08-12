@@ -1,11 +1,14 @@
-import { Request, Response, NextFunction, response } from "express";
-import {
-  generatePromptFromAssessment,
-  generateMockResults,
-} from "./assessment.services.js";
+import { Request, Response, NextFunction } from "express";
+import { generatePromptFromAssessment } from "./assessment.services.js";
 import { Assessment } from "@shared/schemas/assessment.js";
-import { formatAIResponse } from "./assessment.services.js";
+// import { formatAIResponse } from "./assessment.services.js";
 import { getGeminiAIResponse } from "./assessment.ai.js";
+import { RoadmapService } from "@/modules/roadmap/services/roadmap.service.js";
+import {
+  ReactFlowRoadmapSchema,
+  RoadmapListSchema,
+  type RoadmapList,
+} from "@shared/schemas/roadmap.js";
 
 export const generateAIPrompt = (
   req: Request,
@@ -23,7 +26,26 @@ export const aiController = async (req: Request, res: Response) => {
   // const assessment: Assessment = req.body;
   const prompt = req.body.prompt;
   const data = await getGeminiAIResponse(prompt);
-  const assessmentId = `assessment_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+  const assessmentId = `assessment_${Date.now()}_${Math.random()
+    .toString(36)
+    .substr(2, 9)}`;
+
+  try {
+    const userId = req.session.user?.id;
+    if (userId) {
+      // If AI response includes a roadmap compatible with React Flow,
+      // persist it for this user so the dashboard can load it later.
+      const maybeRoadmap = (data && (data as any).roadmap) || null;
+      if (maybeRoadmap && typeof maybeRoadmap === "object") {
+        const reactFlowRoadmap = toReactFlowRoadmap(maybeRoadmap);
+        await RoadmapService.saveRoadmap(userId, reactFlowRoadmap);
+      }
+    }
+  } catch (err) {
+    // Non-fatal: saving roadmap should not block returning assessment results
+    console.error("Failed to save roadmap from assessment:", err);
+  }
+
   res.json({
     success: true,
     assessmentId,
@@ -31,57 +53,38 @@ export const aiController = async (req: Request, res: Response) => {
   });
 };
 
-export const getAssessmentResults = (req: Request, res: Response) => {
-  const { id } = req.params;
+// Ensure any roadmap-like payload is converted to React Flow schema
+function toReactFlowRoadmap(raw: any) {
+  // Already correct shape
+  if (raw && Array.isArray(raw.nodes) && Array.isArray(raw.edges)) {
+    // Validate and coerce minimal fields
+    return ReactFlowRoadmapSchema.parse(raw);
+  }
 
-  // TODO: In production, fetch from database
-  // For now, return mock results based on the assessment ID
-  const mockResults = {
-    skillLevel: "Intermediate",
-    learningStyle: "Project-Based",
-    goalClarity: "Clear",
-    timeCommitment: "6-10 hours/week",
-    preferredLanguages: ["JavaScript", "Python", "React"],
-    interests: ["Backend Development", "Database Design", "API Development"],
-    confidenceLevel: 3,
-    insights: [
-      "You have a solid foundation in programming basics",
-      "You're particularly interested in backend development",
-      "You prefer learning through practical projects",
-      "You have good problem-solving skills",
-      "Your time commitment will allow for steady progress",
-    ],
-    assessmentId: id,
-    roadmap: {
-      phases: [
-        {
-          phase: 1,
-          title: "Foundation",
-          duration: "4-6 weeks",
-          topics: [
-            "Basic Programming Concepts",
-            "Version Control",
-            "Problem Solving",
-          ],
-        },
-        {
-          phase: 2,
-          title: "Core Skills",
-          duration: "8-12 weeks",
-          topics: ["Web Development", "Database Design", "API Development"],
-        },
-        {
-          phase: 3,
-          title: "Advanced Topics",
-          duration: "6-8 weeks",
-          topics: ["Advanced Frameworks", "Testing", "Deployment"],
-        },
-      ],
-    },
-  };
+  // AI list shape: [{ title, description, durationEstimate }]
+  const parsedList = RoadmapListSchema.safeParse(raw);
+  if (parsedList.success) {
+    const list: RoadmapList = parsedList.data;
+    const nodes = list.map((item, index) => ({
+      id: String(index + 1),
+      type: "custom",
+      position: { x: 250, y: index * 150 },
+      data: {
+        label: item.title,
+        description: item.description,
+        tag: `${item.durationEstimate} days`,
+      },
+    }));
+    const edges = nodes.slice(0, -1).map((node, idx) => ({
+      id: `e${node.id}-${nodes[idx + 1].id}`,
+      source: node.id,
+      target: nodes[idx + 1].id,
+      animated: true,
+      type: "custom",
+    }));
+    return ReactFlowRoadmapSchema.parse({ nodes, edges });
+  }
 
-  res.json({
-    success: true,
-    data: mockResults,
-  });
-};
+  // Fallback empty roadmap
+  return { nodes: [], edges: [] };
+}

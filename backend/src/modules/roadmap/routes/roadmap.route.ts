@@ -16,5 +16,5 @@ roadmapRouter.post(
 );
 
 // roadmapRouter.get("/load", isAuthenticated, roadmapLoadingController);
-roadmapRouter.get("/load", roadmapLoadingController);
+roadmapRouter.get("/load", isAuthenticated, roadmapLoadingController);
 export default roadmapRouter;

@@ -18,6 +18,7 @@ import {
   useSaveRoadmapMutation,
 } from "@/features/roadmap/services/roadmap.queries";
 import { CustomNode } from "./components/CustomNode";
+import { normalizeRoadmapPayload } from "@/features/roadmap/services/transform";
 import { CustomEdge } from "./components/CustomEdge";
 import { Toolbar } from "./components/Toolbar";
 import { NodeEditor } from "./components/NodeEditor";
@@ -40,56 +41,7 @@ const edgeTypes = {
   custom: CustomEdge,
 };
 
-// Initial nodes and edges for the example roadmap
-const initialNodes: Node<CustomNodeData>[] = [
-  {
-    id: "1",
-    type: "custom",
-    position: { x: 250, y: 0 },
-    data: {
-      label: "HTML & CSS Fundamentals",
-      description:
-        "Learn the basics of web markup and styling. Understand HTML structure, semantic elements, and CSS properties. Master layout techniques including Flexbox and Grid. Practice responsive design principles and learn to create beautiful, accessible web pages.",
-    },
-  },
-  {
-    id: "2",
-    type: "custom",
-    position: { x: 250, y: 150 },
-    data: {
-      label: "JavaScript Basics",
-      description:
-        "Master JavaScript fundamentals and ES6+ features. Learn variables, data types, functions, and control flow. Understand objects, arrays, and their methods. Practice DOM manipulation and event handling. Explore modern JavaScript features like arrow functions, destructuring, and async/await.",
-    },
-  },
-  {
-    id: "3",
-    type: "custom",
-    position: { x: 250, y: 300 },
-    data: {
-      label: "React Fundamentals",
-      description:
-        "Learn React core concepts and hooks. Understand components, props, and state management. Master React hooks like useState, useEffect, and useContext. Practice building interactive UIs and handling forms. Learn about React Router for navigation and state management patterns.",
-    },
-  },
-];
-
-const initialEdges: Edge[] = [
-  {
-    id: "e1-2",
-    source: "1",
-    target: "2",
-    animated: true,
-    type: "custom",
-  },
-  {
-    id: "e2-3",
-    source: "2",
-    target: "3",
-    animated: true,
-    type: "custom",
-  },
-];
+// Start empty; hydrate from server
 
 // Helper function to assign numbers to nodes based on their connections
 const assignNodeNumbers = (nodes: Node<CustomNodeData>[], edges: Edge[]) => {
@@ -157,8 +109,8 @@ function sanitizeEdges(edges: Edge[]) {
 }
 
 export default function Roadmap() {
-  const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
-  const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
+  const [nodes, setNodes, onNodesChange] = useNodesState<CustomNodeData>([]);
+  const [edges, setEdges, onEdgesChange] = useEdgesState([]);
   const [selectedNode, setSelectedNode] = useState<Node<CustomNodeData> | null>(
     null
   );
@@ -172,13 +124,13 @@ export default function Roadmap() {
     useSaveRoadmapMutation<CustomNodeData>();
 
   useEffect(() => {
-    if (loadedRoadmap) {
-      const sanitizedNodes = sanitizeNodes(loadedRoadmap.nodes);
-      const sanitizedEdges = sanitizeEdges(loadedRoadmap.edges);
-      const numberedNodes = assignNodeNumbers(sanitizedNodes, sanitizedEdges);
-      setNodes(numberedNodes);
-      setEdges(sanitizedEdges);
-    }
+    if (!loadedRoadmap) return;
+    const normalized = normalizeRoadmapPayload(loadedRoadmap);
+    const sanitizedNodes = sanitizeNodes(normalized.nodes);
+    const sanitizedEdges = sanitizeEdges(normalized.edges);
+    const numberedNodes = assignNodeNumbers(sanitizedNodes, sanitizedEdges);
+    setNodes(numberedNodes);
+    setEdges(sanitizedEdges);
   }, [loadedRoadmap, setNodes, setEdges]);
 
   const onConnect = useCallback(

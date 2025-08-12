@@ -1,11 +1,9 @@
 import { Request, Response, NextFunction } from "express";
 import { z } from "zod";
+import { ReactFlowRoadmapSchema } from "@shared/schemas/roadmap.js";
 
 // Accept React Flow style roadmap payload { nodes: [...], edges: [...] }
-const RoadmapFlowSchema = z.object({
-  nodes: z.array(z.unknown()),
-  edges: z.array(z.unknown()),
-});
+const RoadmapFlowSchema = ReactFlowRoadmapSchema;
 
 export const validateRoadmapData = (
   req: Request,

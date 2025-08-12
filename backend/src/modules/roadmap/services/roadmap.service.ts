@@ -1,10 +1,10 @@
 import { BadRequestError, DatabaseError } from "@/shared/errors/AppError.js";
-import { RoadmapType } from "../schema/roadmap.schema.js";
+import type { ReactFlowRoadmap } from "@shared/schemas/roadmap.js";
 import prisma from "@/config/db.config.js";
 // import { BadRequestError } from "@shared/errors/AppError.js";
 
 export class RoadmapService {
-  static async saveRoadmap(userId: number, roadmapData: RoadmapType) {
+  static async saveRoadmap(userId: number, roadmapData: ReactFlowRoadmap) {
     const result = prisma.roadmap.upsert({
       where: { userId },
       update: { roadmap_data: roadmapData },
@@ -13,7 +13,7 @@ export class RoadmapService {
     return result;
   }
 
-  static async loadRoadmap(userId: number): Promise<RoadmapType> {
+  static async loadRoadmap(userId: number): Promise<ReactFlowRoadmap> {
     console.log("userId is: ", userId);
     try {
       const roadmap = await prisma.roadmap.findUnique({
@@ -21,9 +21,10 @@ export class RoadmapService {
         select: { roadmap_data: true },
       });
       if (!roadmap) {
-        throw new BadRequestError();
+        // Return an empty roadmap shape compatible with React Flow
+        return { nodes: [], edges: [] } as ReactFlowRoadmap;
       }
-      return roadmap.roadmap_data as RoadmapType;
+      return roadmap.roadmap_data as ReactFlowRoadmap;
     } catch (error) {
       throw new DatabaseError("Failed to fetch roadmap");
     }

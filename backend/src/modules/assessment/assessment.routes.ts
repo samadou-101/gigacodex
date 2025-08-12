@@ -3,7 +3,7 @@ import { validateAssessment } from "./assessment.middleware.js";
 import {
   generateAIPrompt,
   aiController,
-  getAssessmentResults,
+  // getAssessmentResults,
 } from "./assessment.controllers.js";
 
 const assessmentRouter = Router();
@@ -17,6 +17,6 @@ assessmentRouter.post(
 );
 
 // Get assessment results by ID
-assessmentRouter.get("/results/:id", getAssessmentResults);
+// assessmentRouter.get("/results/:id", getAssessmentResults);
 
 export default assessmentRouter;

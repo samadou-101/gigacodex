@@ -1,10 +1,10 @@
 import { Request, Response } from "express";
-import { RoadmapType } from "../schema/roadmap.schema.js";
+import type { ReactFlowRoadmap } from "@shared/schemas/roadmap.js";
 import { RoadmapService } from "../services/roadmap.service.js";
 
 export const roadmapSavingController = async (req: Request, res: Response) => {
   try {
-    const roadmapData: RoadmapType = req.body;
+    const roadmapData: ReactFlowRoadmap = req.body;
     const userId = req.session.user?.id;
 
     if (!userId) {

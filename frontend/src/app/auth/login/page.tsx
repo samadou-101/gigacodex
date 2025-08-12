@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { Mail, Lock, ArrowRight } from "lucide-react";
+import { useLoginMutation } from "@/features/auth/services/auth.queries";
 
 export default function Login() {
   const router = useRouter();
@@ -12,19 +13,16 @@ export default function Login() {
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
+  const { mutateAsync: login, isPending } = useLoginMutation();
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
-
     try {
-      // TODO: Implement actual login logic here
-      console.log("Login attempt with:", { email, password });
-
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-
-      // Redirect to dashboard on success
-      router.push("/dashboard");
+      const res = await login({ email, password });
+      if (res?.success) {
+        router.push("/dashboard");
+      }
     } catch (error) {
       console.error("Login failed:", error);
     } finally {
@@ -126,7 +124,7 @@ export default function Login() {
               disabled={isLoading}
               className="w-full flex items-center justify-center px-6 py-3 bg-gradient-to-r from-blue-600 to-blue-800 hover:from-blue-700 hover:to-blue-900 text-white rounded-xl font-medium transition-all duration-300 hover:scale-105 shadow-lg shadow-blue-500/25 hover:shadow-xl hover:shadow-blue-500/30 disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {isLoading ? (
+              {isLoading || isPending ? (
                 "Signing in..."
               ) : (
                 <>

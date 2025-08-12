@@ -1,5 +1,8 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import apiClient from "@/features/assessment/services/api-client";
 import type { Edge, Node } from "reactflow";
+import { normalizeRoadmapPayload } from "./transform";
+import type { ReactFlowRoadmap } from "@shared/schemas/roadmap";
 
 export interface RoadmapPayload<CustomNodeData = unknown> {
   nodes: Node<CustomNodeData>[];
@@ -17,13 +20,23 @@ export class RoadmapService {
     data: RoadmapPayload<CustomNodeData>
   ): Promise<RoadmapResponse<CustomNodeData>> {
     const response = await apiClient.post("/api/roadmap/save", data);
-    return { success: true, roadmap: response.data.roadmap };
+    return {
+      success: true,
+      roadmap: normalizeRoadmapPayload(
+        response.data.roadmap
+      ) as ReactFlowRoadmap,
+    } as any;
   }
 
   static async loadRoadmap<CustomNodeData = unknown>(): Promise<
     RoadmapResponse<CustomNodeData>
   > {
     const response = await apiClient.get("/api/roadmap/load");
-    return { success: true, roadmap: response.data.roadmap };
+    return {
+      success: true,
+      roadmap: normalizeRoadmapPayload(
+        response.data.roadmap
+      ) as ReactFlowRoadmap,
+    } as any;
   }
 }
