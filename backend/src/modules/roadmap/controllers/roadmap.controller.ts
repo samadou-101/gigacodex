@@ -23,9 +23,17 @@ export const roadmapSavingController = async (req: Request, res: Response) => {
   }
 };
 
-export const roadmapLoadingController = async (req: Request, rse: Response) => {
+export const roadmapLoadingController = async (req: Request, res: Response) => {
   try {
     const userId = req.session.user?.id;
-    const roadmapData = RoadmapService.loadRoadmap(userId);
-  } catch (error) {}
+    if (!userId) {
+      res.status(401).json({ message: "Unauthorized" });
+      return;
+    }
+
+    const roadmapData = await RoadmapService.loadRoadmap(userId);
+    res.status(200).json({ roadmap: roadmapData });
+  } catch (error) {
+    res.status(500).json({ message: "Failed to load roadmap" });
+  }
 };

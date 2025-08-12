@@ -14,9 +14,10 @@ export class RoadmapService {
   }
 
   static async loadRoadmap(userId: number): Promise<RoadmapType> {
+    console.log("userId is: ", userId);
     try {
       const roadmap = await prisma.roadmap.findUnique({
-        where: { id: userId },
+        where: { userId: userId },
         select: { roadmap_data: true },
       });
       if (!roadmap) {

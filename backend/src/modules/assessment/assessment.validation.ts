@@ -1,8 +1,9 @@
-import {
-  assessmentSchema,
+import { assessmentSchema } from "@shared/schemas/assessment.js";
+import type {
   Assessment,
   AssessmentSubmission,
   AssessmentAnswer,
 } from "@shared/schemas/assessment.js";
 
-export { assessmentSchema, Assessment, AssessmentSubmission, AssessmentAnswer };
+export { assessmentSchema };
+export type { Assessment, AssessmentSubmission, AssessmentAnswer };

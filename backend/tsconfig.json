@@ -25,7 +25,8 @@
     "baseUrl": ".",
     "paths": {
       "@/*": ["./src/*"],
-      "@shared/*": [".src/shared/*"],
+      // "@shared/*": [".src/shared/*"],
+      "@shared/*": ["../shared/*"],
       "@common/*": ["src/shared/*"],
       "@modules/*": ["./src/modules/*"],
       "@config/*": ["src/shared/config/*"],
@@ -38,6 +39,6 @@
       "@blog/*": ["./src/modules/blog/*"]
     }
   },
-  "include": ["./**/*"],
+  "include": ["./**/*", "../shared/**/*"],
   "exclude": ["node_modules", "dist"]
 }

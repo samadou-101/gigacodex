@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from "express";
-import { assessmentSchema } from "@shared/schemas/assessment.js";
+import { assessmentSchema } from "./assessment.validation.js";
+// import { assessmentSchema } from "@shared/schemas/assessment.js";
 
 export const validateAssessment = (
   req: Request,
