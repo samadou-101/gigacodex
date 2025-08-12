@@ -1,5 +1,11 @@
 import { Request, Response, NextFunction } from "express";
-import { RoadmapSchema } from "../schema/roadmap.schema.js";
+import { z } from "zod";
+
+// Accept React Flow style roadmap payload { nodes: [...], edges: [...] }
+const RoadmapFlowSchema = z.object({
+  nodes: z.array(z.unknown()),
+  edges: z.array(z.unknown()),
+});
 
 export const validateRoadmapData = (
   req: Request,
@@ -7,7 +13,7 @@ export const validateRoadmapData = (
   next: NextFunction
 ) => {
   try {
-    const roadmapData = RoadmapSchema.parse(req.body);
+    const roadmapData = RoadmapFlowSchema.parse(req.body);
     req.body = roadmapData;
     next();
   } catch (error: unknown) {

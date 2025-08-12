@@ -13,6 +13,10 @@ import ReactFlow, {
 } from "reactflow";
 import "reactflow/dist/style.css";
 import { ThemeToggle } from "@/components/ThemeToggle";
+import {
+  useLoadRoadmapQuery,
+  useSaveRoadmapMutation,
+} from "@/features/roadmap/services/roadmap.queries";
 import { CustomNode } from "./components/CustomNode";
 import { CustomEdge } from "./components/CustomEdge";
 import { Toolbar } from "./components/Toolbar";
@@ -162,9 +166,20 @@ export default function Roadmap() {
   const [activeAction, setActiveAction] = useState<"edit" | "ai" | null>(null);
   const [saveStatus, setSaveStatus] = useState<"idle" | "success">("idle");
   const reactFlowWrapper = useRef<HTMLDivElement>(null);
+  const { data: loadedRoadmap, refetch: refetchRoadmap } =
+    useLoadRoadmapQuery<CustomNodeData>();
+  const { mutate: saveRoadmapMutation, isSuccess: isSaveSuccess } =
+    useSaveRoadmapMutation<CustomNodeData>();
+
   useEffect(() => {
-    loadRoadmap();
-  }, []);
+    if (loadedRoadmap) {
+      const sanitizedNodes = sanitizeNodes(loadedRoadmap.nodes);
+      const sanitizedEdges = sanitizeEdges(loadedRoadmap.edges);
+      const numberedNodes = assignNodeNumbers(sanitizedNodes, sanitizedEdges);
+      setNodes(numberedNodes);
+      setEdges(sanitizedEdges);
+    }
+  }, [loadedRoadmap, setNodes, setEdges]);
 
   const onConnect = useCallback(
     (params: Connection) => {
@@ -231,32 +246,21 @@ export default function Roadmap() {
   }, [selectedNode, setNodes, setEdges]);
 
   const saveRoadmap = useCallback(() => {
-    const roadmapData = {
-      nodes,
-      edges,
-    };
-    localStorage.setItem("roadmap", JSON.stringify(roadmapData));
-    setSaveStatus("success");
-  }, [nodes, edges]);
+    const roadmapData = { nodes, edges };
+    saveRoadmapMutation(roadmapData);
+  }, [nodes, edges, saveRoadmapMutation]);
 
   useEffect(() => {
-    if (saveStatus === "success") {
+    if (isSaveSuccess) {
+      setSaveStatus("success");
       const timeout = setTimeout(() => setSaveStatus("idle"), 2000);
       return () => clearTimeout(timeout);
     }
-  }, [saveStatus]);
+  }, [isSaveSuccess]);
 
   const loadRoadmap = useCallback(() => {
-    const savedRoadmap = localStorage.getItem("roadmap");
-    if (savedRoadmap) {
-      const { nodes: savedNodes, edges: savedEdges } = JSON.parse(savedRoadmap);
-      const sanitizedNodes = sanitizeNodes(savedNodes);
-      const sanitizedEdges = sanitizeEdges(savedEdges);
-      const numberedNodes = assignNodeNumbers(sanitizedNodes, sanitizedEdges);
-      setNodes(numberedNodes);
-      setEdges(sanitizedEdges);
-    }
-  }, [setNodes, setEdges]);
+    void refetchRoadmap();
+  }, [refetchRoadmap]);
 
   const updateNode = useCallback(
     (nodeId: string, data: Partial<CustomNodeData>) => {
