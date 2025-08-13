@@ -38,7 +38,7 @@ Assessment Answers:
 ${answersText}
 
  insights: brief, helpful feedback for the user (max 3 short points)
- roadmap: 3-5 steps
+ roadmap: detailed roadmap for the user (no specific number of nodes but detail it according to the user answers)
   `.trim();
 }
 
