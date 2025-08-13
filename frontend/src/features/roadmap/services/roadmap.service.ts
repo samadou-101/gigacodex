@@ -19,12 +19,12 @@ export class RoadmapService {
   static async saveRoadmap<CustomNodeData = unknown>(
     data: RoadmapPayload<CustomNodeData>
   ): Promise<RoadmapResponse<CustomNodeData>> {
-    const response = await apiClient.post("/api/roadmap/save", data);
+    await apiClient.post("/api/roadmap/save", data);
     return {
       success: true,
-      roadmap: normalizeRoadmapPayload(
-        response.data.roadmap
-      ) as ReactFlowRoadmap,
+      // roadmap: normalizeRoadmapPayload(
+      //   response.data.roadmap
+      // ) as ReactFlowRoadmap,
     } as any;
   }
 
