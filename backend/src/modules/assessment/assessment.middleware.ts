@@ -1,6 +1,5 @@
 import { Request, Response, NextFunction } from "express";
-import { assessmentSchema } from "./assessment.validation.js";
-// import { assessmentSchema } from "@shared/schemas/assessment.js";
+import { AssessmentSchema } from "@shared/schemas/assessment.js";
 
 export const validateAssessment = (
   req: Request,
@@ -9,7 +8,7 @@ export const validateAssessment = (
 ) => {
   console.log("Received assessment data:", JSON.stringify(req.body, null, 2));
 
-  const validationResult = assessmentSchema.safeParse(req.body);
+  const validationResult = AssessmentSchema.safeParse(req.body);
 
   if (!validationResult.success) {
     console.error("Validation failed:", validationResult.error.flatten());

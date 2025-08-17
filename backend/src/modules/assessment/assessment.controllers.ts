@@ -1,9 +1,9 @@
 import { Request, Response, NextFunction } from "express";
 import { generatePromptFromAssessment } from "./assessment.services.js";
-import { Assessment } from "@shared/schemas/assessment.js";
+import { AssessmentInput } from "@shared/schemas/assessment.js";
 // import { formatAIResponse } from "./assessment.services.js";
 import { getGeminiAIResponse } from "./assessment.ai.js";
-import { RoadmapService } from "@/modules/roadmap/services/roadmap.service.js";
+import { RoadmapService } from "@modules/roadmap/services/roadmap.service.js";
 import {
   ReactFlowRoadmapSchema,
   RoadmapListSchema,
@@ -15,7 +15,7 @@ export const generateAIPrompt = (
   res: Response,
   next: NextFunction
 ) => {
-  const assessment: Assessment = req.body;
+  const assessment: AssessmentInput = req.body;
   const prompt = generatePromptFromAssessment(assessment);
 
   req.body.prompt = prompt;

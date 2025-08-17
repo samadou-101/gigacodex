@@ -1,67 +1,85 @@
+// shared/schema/assessment-schema.ts
 import { z } from "zod";
 
-// Question types
-export type QuestionType = "single" | "multiple";
+// ------------------------------------
+// Schema: One property per question
+// ------------------------------------
+export const AssessmentSchema = z.object({
+  userId: z.string().uuid(), // if you want to track user
 
-export interface Question {
-  id: number;
-  section: string;
-  question: string;
-  options: string[];
-  type: QuestionType;
-  icon: any; // Using any for LucideIcon to avoid frontend dependency
-}
+  // Q1: Skill level (single choice)
+  codingConfidence: z.enum([
+    "hello_world",
+    "simple_projects",
+    "use_apis",
+    "full_apps",
+    "not_sure",
+  ]),
 
-// Answer types for individual questions
-export interface AssessmentAnswer {
-  questionId: number;
-  answers: string[];
-}
+  // Q2: Languages (multiple choice)
+  programmingLanguages: z.array(
+    z.enum(["html_css", "javascript", "python", "java_cpp", "none"])
+  ),
 
-// Complete assessment submission with both form data and answers
-export interface AssessmentSubmission {
-  // Form data
-  name: string;
-  age: number;
-  experienceLevel: "beginner" | "intermediate" | "advanced";
-  goals: string[];
-  knownLanguages?: string[];
-  learningStyle?: "visual" | "auditory" | "kinesthetic";
-  timePerWeek: number;
-  hasComputer: boolean;
-  preferredTrack: "frontend" | "backend" | "fullstack";
-  otherNotes?: string;
+  // Q3: CS concepts confidence (single choice)
+  csUnderstanding: z.enum([
+    "not_familiar",
+    "basics",
+    "ds_algo",
+    "systems",
+    "theory_confident",
+  ]),
 
-  // Assessment answers
-  answers: AssessmentAnswer[];
-}
+  // Q4: CS topics known (multiple)
+  csTopics: z.array(
+    z.enum([
+      "arrays_lists",
+      "big_o",
+      "recursion",
+      "http_tcp_dns",
+      "memory_threads",
+      "none",
+    ])
+  ),
 
-// Frontend state for tracking answers during assessment
-export interface AssessmentState {
-  currentQuestion: number;
-  answers: Record<number, string[]>;
-  selectedOptions: string[];
-  additionalInput: string;
-}
+  // Q5: Problem-solving practice (single)
+  problemSolving: z.enum([
+    "not_yet",
+    "few_problems",
+    "regular",
+    "timed_challenges",
+  ]),
 
-// Zod schemas for validation
-export const assessmentAnswerSchema = z.object({
-  questionId: z.number(),
-  answers: z.array(z.string()),
+  // Q6: Tools used (multiple)
+  tools: z.array(
+    z.enum(["editors", "git", "browser_devtools", "terminal", "none"])
+  ),
+
+  // Q7: Weekly time (single)
+  weeklyCommitment: z.enum(["lt3", "3_5", "6_10", "gt10"]),
+
+  // Q8: Goal (single)
+  mainGoal: z.enum(["get_job", "freelance", "projects", "exploring"]),
+
+  // Q9: Confidence scale (single)
+  confidence: z.enum([
+    "getting_started",
+    "few_basics",
+    "simple_projects",
+    "full_apps_help",
+    "confident",
+  ]),
+
+  // Q10: Tech interests (multiple)
+  interests: z.array(z.enum(["web", "mobile", "game", "data_ai", "not_sure"])),
+
+  // Q11: Learning style (multiple)
+  learningStyle: z.array(
+    z.enum(["video", "reading", "projects", "help_when_stuck", "mix"])
+  ),
+
+  // Optional additional notes/input
+  additionalNotes: z.string().optional(),
 });
 
-export const assessmentSchema = z.object({
-  name: z.string().min(1),
-  age: z.number().int().min(10).max(100),
-  experienceLevel: z.enum(["beginner", "intermediate", "advanced"]),
-  goals: z.array(z.string()).min(1),
-  knownLanguages: z.array(z.string()).optional(),
-  learningStyle: z.enum(["visual", "auditory", "kinesthetic"]).optional(),
-  timePerWeek: z.number().int().min(1),
-  hasComputer: z.boolean(),
-  preferredTrack: z.enum(["frontend", "backend", "fullstack"]),
-  otherNotes: z.string().optional(),
-  answers: z.array(assessmentAnswerSchema),
-});
-
-export type Assessment = z.infer<typeof assessmentSchema>;
+export type AssessmentInput = z.infer<typeof AssessmentSchema>;

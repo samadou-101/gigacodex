@@ -1,49 +1,47 @@
-import { Assessment } from "@shared/schemas/assessment.js";
+import { AssessmentInput } from "@shared/schemas/assessment.js";
 
-export function generatePromptFromAssessment(assessment: Assessment): string {
+export function generatePromptFromAssessment(
+  assessment: AssessmentInput
+): string {
   const {
-    name,
-    age,
-    experienceLevel,
-    goals,
-    knownLanguages,
+    codingConfidence,
+    programmingLanguages,
+    csUnderstanding,
+    csTopics,
+    problemSolving,
+    tools,
+    weeklyCommitment,
+    mainGoal,
+    confidence,
+    interests,
     learningStyle,
-    timePerWeek,
-    hasComputer,
-    preferredTrack,
-    otherNotes,
-    answers,
+    additionalNotes,
   } = assessment;
 
-  // Format answers for the prompt
-  const answersText = answers
-    .map(
-      (answer) => `Question ${answer.questionId}: ${answer.answers.join(", ")}`
-    )
-    .join("\n");
-
   return `
-Name: ${name}
-Age: ${age}
-Experience Level: ${experienceLevel}
-Goals: ${goals.join(", ")}
-Known Languages: ${knownLanguages?.join(", ") || "None"}
-Learning Style: ${learningStyle || "Not specified"}
-Time Available per Week: ${timePerWeek} hours
-Has a Computer: ${hasComputer ? "Yes" : "No"}
-Preferred Track: ${preferredTrack}
-Additional Notes: ${otherNotes || "None"}
+Assessment Results:
+Coding Confidence: ${codingConfidence}
+Programming Languages: ${programmingLanguages.join(", ")}
+CS Understanding: ${csUnderstanding}
+CS Topics Known: ${csTopics.join(", ")}
+Problem Solving Practice: ${problemSolving}
+Tools Used: ${tools.join(", ")}
+Weekly Commitment: ${weeklyCommitment}
+Main Goal: ${mainGoal}
+Confidence Level: ${confidence}
+Tech Interests: ${interests.join(", ")}
+Learning Style: ${learningStyle.join(", ")}
 
-Assessment Answers:
-${answersText}
+Additional Notes: ${additionalNotes || "None"}
 
- insights: brief, helpful feedback for the user (max 3 short points)
- roadmap: detailed roadmap for the user (no specific number of nodes but detail it according to the user answers)
+Based on this assessment, provide:
+insights: brief, helpful feedback for the user (max 3 short points)
+roadmap: detailed roadmap for the user (no specific number of nodes but detail it according to the user answers)
   `.trim();
 }
 
 // Given the user's profile and assessment answers below, return only:
-// roadmap: a structured JSON object with 3–5 steps tailored to the user’s current level, goals, time availability, and preferred track. Each step should include:
+// roadmap: a structured JSON object with 3–5 steps tailored to the user's current level, goals, time availability, and preferred track. Each step should include:
 // title
 // description
 // durationEstimate (in weeks)
@@ -63,12 +61,6 @@ export function formatAIResponse(rawText: string | undefined) {
   insightsList.forEach((text, index) => {
     insights[`${index + 1}`] = text.replace(/^\d+\.\s*/, ""); // Remove leading numbering like "1. "
   });
-  // const insights = insightsRaw
-  //   .replace(/^insights:\s*/i, "")
-  //   .split("\n")
-  //   .map((s) => s.trim())
-  //   .filter(Boolean)
-  //   .map((s) => s.replace(/^\*+\s*/, ""));
 
   let roadmap = [];
 
@@ -88,82 +80,104 @@ export function formatAIResponse(rawText: string | undefined) {
 }
 
 // Mock results generator based on assessment data
-export function generateMockResults(assessment: Assessment) {
-  const { experienceLevel, goals, preferredTrack, timePerWeek, answers } =
+export function generateMockResults(assessment: AssessmentInput) {
+  const { codingConfidence, mainGoal, weeklyCommitment, interests } =
     assessment;
 
   // Analyze answers to determine skill level and interests
-  const skillLevel = determineSkillLevel(answers, experienceLevel);
-  const learningStyle = determineLearningStyle(answers);
-  const interests = determineInterests(answers, preferredTrack);
+  const skillLevel = determineSkillLevel(codingConfidence);
+  const learningStyle = determineLearningStyle(assessment);
+  const techInterests = determineInterests(interests);
 
   return {
     skillLevel,
     learningStyle,
     goalClarity: "Clear",
-    timeCommitment: `${timePerWeek} hours/week`,
-    preferredLanguages: determineLanguages(answers),
-    interests,
-    confidenceLevel: determineConfidenceLevel(answers),
+    timeCommitment: `${weeklyCommitment} hours/week`,
+    preferredLanguages: determineLanguages(assessment),
+    interests: techInterests,
+    confidenceLevel: determineConfidenceLevel(assessment),
     insights: generateInsights(assessment),
     roadmap: generateRoadmap(assessment),
   };
 }
 
-export function determineSkillLevel(
-  answers: any[],
-  experienceLevel: string
-): string {
-  // Analyze answers to determine skill level
-  if (experienceLevel === "advanced") return "Advanced";
-  if (experienceLevel === "intermediate") return "Intermediate";
+export function determineSkillLevel(codingConfidence: string): string {
+  // Analyze coding confidence to determine skill level
+  if (codingConfidence === "full_apps") return "Advanced";
+  if (codingConfidence === "use_apis" || codingConfidence === "simple_projects")
+    return "Intermediate";
   return "Beginner";
 }
 
-export function determineLearningStyle(answers: any[]): string {
-  // Analyze answers to determine learning style
-  return "Project-Based";
+export function determineLearningStyle(assessment: AssessmentInput): string {
+  // Analyze learning style preferences
+  if (assessment.learningStyle.includes("projects")) return "Project-Based";
+  if (assessment.learningStyle.includes("video")) return "Video-Based";
+  if (assessment.learningStyle.includes("reading")) return "Reading-Based";
+  return "Mixed";
 }
 
-export function determineInterests(
-  answers: any[],
-  preferredTrack: string
-): string[] {
-  const interests = [];
-  if (preferredTrack === "frontend") interests.push("Frontend Development");
-  if (preferredTrack === "backend") interests.push("Backend Development");
-  if (preferredTrack === "fullstack") {
-    interests.push("Frontend Development", "Backend Development");
-  }
-  return interests;
+export function determineInterests(interests: string[]): string[] {
+  const interestMap: Record<string, string> = {
+    web: "Web Development",
+    mobile: "Mobile Development",
+    game: "Game Development",
+    data_ai: "Data Science & AI",
+  };
+
+  return interests.map((interest) => interestMap[interest] || interest);
 }
 
-export function determineLanguages(answers: any[]): string[] {
-  // Extract language preferences from answers
-  return ["JavaScript", "Python"];
+export function determineLanguages(assessment: AssessmentInput): string[] {
+  // Extract language preferences from assessment
+  const languageMap: Record<string, string> = {
+    html_css: "HTML/CSS",
+    javascript: "JavaScript",
+    python: "Python",
+    java_cpp: "Java/C++",
+  };
+
+  return assessment.programmingLanguages
+    .filter((lang) => lang !== "none")
+    .map((lang) => languageMap[lang] || lang);
 }
 
-export function determineConfidenceLevel(answers: any[]): number {
+export function determineConfidenceLevel(assessment: AssessmentInput): number {
   // Analyze confidence-related answers
-  return 3;
+  const confidenceMap: Record<string, number> = {
+    getting_started: 1,
+    few_basics: 2,
+    simple_projects: 3,
+    full_apps_help: 4,
+    confident: 5,
+  };
+
+  return confidenceMap[assessment.confidence] || 3;
 }
 
-export function generateInsights(assessment: Assessment): string[] {
+export function generateInsights(assessment: AssessmentInput): string[] {
   const insights = [];
 
-  if (assessment.experienceLevel === "beginner") {
+  if (
+    assessment.codingConfidence === "hello_world" ||
+    assessment.codingConfidence === "not_sure"
+  ) {
     insights.push(
       "You're just starting your coding journey - perfect time to build a strong foundation"
     );
   }
 
-  if (assessment.goals.includes("Get my first job")) {
+  if (assessment.mainGoal === "get_job") {
     insights.push(
       "You're focused on career transition - we'll prioritize job-ready skills"
     );
   }
 
-  if (assessment.timePerWeek >= 10) {
+  if (
+    assessment.weeklyCommitment === "gt10" ||
+    assessment.weeklyCommitment === "6_10"
+  ) {
     insights.push(
       "You have good time commitment - this will accelerate your progress"
     );
@@ -173,7 +187,7 @@ export function generateInsights(assessment: Assessment): string[] {
 }
 
 export function generateRoadmap(
-  assessment: Assessment
+  assessment: AssessmentInput
 ): Record<string, unknown> {
   // Generate personalized roadmap based on assessment
   return {

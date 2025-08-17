@@ -1,3 +1,6 @@
+import { AssessmentInput } from "@shared/schemas/assessment";
+
+/* eslint-disable @typescript-eslint/no-explicit-any */
 export interface AssessmentResultData {
   skillLevel: string;
   learningStyle: string;
@@ -22,4 +25,17 @@ export interface AssessmentResponse {
   success: boolean;
   data?: AssessmentResultData;
   error?: string;
+}
+
+export type QuestionType = "single" | "multiple";
+
+export interface Question {
+  // id: number;
+  id: keyof AssessmentInput;
+  section: string;
+  question: string;
+  options: string[];
+  type: QuestionType;
+  icon: any; // keep any to avoid frontend dependency (LucideIcon)
+  additionalInput?: string;
 }

@@ -1,5 +1,5 @@
 // Export types
-export * from "./types";
+export * from "../types";
 
 // Export services
 export { AssessmentService } from "./assessment.service";

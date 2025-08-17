@@ -1,22 +1,21 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { questions } from "@/app/get-started/assessment/assessment-content";
-import {
-  AssessmentAnswer,
-  AssessmentSubmission,
-} from "@shared/schemas/assessment";
+import { AssessmentInput } from "@shared/schemas/assessment";
 import { AssessmentService } from "../services";
 
 export function useAssessmentLogic() {
   const router = useRouter();
-  const [currentQuestion, setCurrentQuestion] = useState(0);
-  const [answers, setAnswers] = useState<Record<number, string[]>>({});
+  const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
+  const [formData, setFormData] = useState<Partial<AssessmentInput>>({});
   const [selectedOptions, setSelectedOptions] = useState<string[]>([]);
-  const [additionalInput, setAdditionalInput] = useState("");
-  const maxCharacters = 500;
+  const [additionalNotes, setAdditionalNotes] = useState("");
 
+  const currentQuestion = questions[currentQuestionIndex];
+
+  // Select option(s)
   const handleOptionSelect = (option: string) => {
-    if (questions[currentQuestion].type === "single") {
+    if (currentQuestion.type === "single") {
       setSelectedOptions([option]);
     } else {
       setSelectedOptions((prev) =>
@@ -27,158 +26,168 @@ export function useAssessmentLogic() {
     }
   };
 
+  // Next
   const handleNext = () => {
-    setAnswers((prev) => ({
-      ...prev,
-      [questions[currentQuestion].id]: selectedOptions,
-    }));
+    // Save current question's answer
+    const answer =
+      currentQuestion.type === "single" ? selectedOptions[0] : selectedOptions;
+    console.log(`Saving answer for ${currentQuestion.id}:`, answer);
+
+    setFormData((prev) => {
+      const newFormData = {
+        ...prev,
+        [currentQuestion.id]: answer,
+      };
+      console.log("Updated form data:", newFormData);
+      return newFormData;
+    });
+
     setSelectedOptions([]);
-    setCurrentQuestion((prev) => prev + 1);
+
+    // Move to next step
+    setCurrentQuestionIndex((prev) => prev + 1);
   };
 
+  // Previous
   const handlePrevious = () => {
-    setCurrentQuestion((prev) => prev - 1);
-    setSelectedOptions(answers[questions[currentQuestion - 1].id] || []);
+    setCurrentQuestionIndex((prev) => prev - 1);
+    const prevQuestion = questions[currentQuestionIndex - 1];
+    const prevAnswer = formData[prevQuestion.id];
+
+    if (typeof prevAnswer === "string") {
+      setSelectedOptions([prevAnswer]);
+    } else if (Array.isArray(prevAnswer)) {
+      setSelectedOptions(prevAnswer);
+    } else {
+      setSelectedOptions([]);
+    }
   };
 
-  // Convert answers to the proper format for backend submission
-  const formatAnswersForSubmission = (): AssessmentAnswer[] => {
-    return Object.entries(answers).map(([questionId, answers]) => ({
-      questionId: parseInt(questionId),
-      answers,
+  // Save current question's answer (used before submission)
+  const saveCurrentAnswer = () => {
+    setFormData((prev) => ({
+      ...prev,
+      [currentQuestion.id]:
+        currentQuestion.type === "single"
+          ? selectedOptions[0]
+          : selectedOptions,
     }));
   };
 
-  // Create complete assessment submission
-  const createAssessmentSubmission = (formData: {
-    name: string;
-    age: number;
-    experienceLevel: "beginner" | "intermediate" | "advanced";
-    goals: string[];
-    knownLanguages?: string[];
-    learningStyle?: "visual" | "auditory" | "kinesthetic";
-    timePerWeek: number;
-    hasComputer: boolean;
-    preferredTrack: "frontend" | "backend" | "fullstack";
-    otherNotes?: string;
-  }): AssessmentSubmission => {
-    return {
-      ...formData,
-      answers: formatAnswersForSubmission(),
-    };
-  };
-
+  // Submit
   const handleSubmit = async () => {
     try {
-      const formattedAnswers = formatAnswersForSubmission();
-      console.log("Formatted answers for backend:", formattedAnswers);
-      console.log("Additional input:", additionalInput);
+      // If we're in the additional input step, currentQuestion is undefined
+      // All answers should already be in formData
+      let formDataWithCurrent = { ...formData };
 
-      // Create a complete submission (you would get this data from a form)
-      const submission = createAssessmentSubmission({
-        name: "User Name", // This should come from a form
-        age: 25, // This should come from a form
-        experienceLevel: "beginner", // This should come from a form
-        goals: ["Get my first job"], // This should come from a form
-        timePerWeek: 10, // This should come from a form
-        hasComputer: true, // This should come from a form
-        preferredTrack: "frontend", // This should come from a form
-        otherNotes: additionalInput,
-      });
+      // Only try to get current answer if we're still on a question
+      if (currentQuestion && currentQuestionIndex < questions.length) {
+        const currentAnswer =
+          currentQuestion.type === "single"
+            ? selectedOptions[0]
+            : selectedOptions;
+        formDataWithCurrent = {
+          ...formData,
+          [currentQuestion.id]: currentAnswer,
+        };
+      }
 
-      console.log(
-        "Complete submission object:",
-        JSON.stringify(submission, null, 2)
+      // Generate a proper UUID format
+      const tempUserId = crypto.randomUUID();
+
+      // Check if all required fields are present
+      const requiredFields: (keyof AssessmentInput)[] = [
+        "codingConfidence",
+        "programmingLanguages",
+        "csUnderstanding",
+        "csTopics",
+        "problemSolving",
+        "tools",
+        "weeklyCommitment",
+        "mainGoal",
+        "confidence",
+        "interests",
+        "learningStyle",
+      ];
+
+      const missingFields = requiredFields.filter(
+        (field) => !formDataWithCurrent[field]
       );
 
-      // Submit to backend
-      const response = await AssessmentService.submitAssessment(submission);
+      if (missingFields.length > 0) {
+        console.error("Missing required fields:", missingFields);
+        throw new Error(
+          `Please complete all questions before submitting. Missing: ${missingFields.join(
+            ", "
+          )}`
+        );
+      }
 
-      console.log("Backend Response:", response);
-      console.log("Response Data:", response.data);
+      const data: AssessmentInput = {
+        ...formDataWithCurrent,
+        userId: tempUserId,
+        additionalNotes: additionalNotes.trim() || undefined,
+      } as AssessmentInput;
+
+      console.log("Submitting assessment data:", data);
+
+      const response = await AssessmentService.submitAssessment(data);
 
       if (response.success && response.data) {
-        console.log("Assessment submitted successfully, redirecting...");
-
-        // Store assessment ID in localStorage for immediate use
         if (response.data.assessmentId) {
           localStorage.setItem(
             "currentAssessmentId",
             response.data.assessmentId
           );
-          console.log("Stored assessment ID:", response.data.assessmentId);
         }
-
-        // Store results in localStorage for immediate access
         localStorage.setItem(
           "assessmentResults",
           JSON.stringify(response.data)
         );
-        console.log("Stored assessment results in localStorage");
 
-        // Navigate to results page
-        console.log("About to navigate to:", "/get-started/assessment/results");
-
-        // Try different path formats with assessment ID in URL
         const assessmentId = response.data.assessmentId;
-        // const paths = [
-        //   `/get-started/assessment/results?assessmentId=${assessmentId}`,
-        //   `/get-started/assessment/results?assessmentId=${assessmentId}`,
-        //   `/assessment/results?assessmentId=${assessmentId}`,
-        //   `/assessment/results?assessmentId=${assessmentId}`,
-        // ];
-        const paths = [
-          `/get-started/assessment/results?assessmentId=${assessmentId}`,
-          `/get-started/assessment/results?assessmentId=${assessmentId}`,
-          `/assessment/results?assessmentId=${assessmentId}`,
-          `/assessment/results?assessmentId=${assessmentId}`,
-        ];
-
-        for (const path of paths) {
-          try {
-            console.log(`Trying path: ${path}`);
-            router.push(path);
-            console.log(`Navigation successful with path: ${path}`);
-            break;
-          } catch {
-            console.log(`Failed with path: ${path}`);
-          }
-        }
-
-        console.log("Navigation initiated");
-
-        // Don't throw any errors after successful submission
+        router.push(
+          `/get-started/assessment/results?assessmentId=${assessmentId}`
+        );
         return;
       } else {
-        console.error("Assessment submission failed:", response.error);
         throw new Error(response.error || "Failed to submit assessment");
       }
     } catch (error) {
       console.error("Error submitting assessment:", error);
-      throw error; // Re-throw to let the component handle the loading state
+      throw error;
     }
   };
 
-  const progress = ((currentQuestion + 1) / questions.length) * 100;
-  const currentSection = questions[currentQuestion].section;
-  const CurrentIcon = questions[currentQuestion].icon;
+  const progress =
+    currentQuestionIndex >= questions.length
+      ? 100
+      : ((currentQuestionIndex + 1) / questions.length) * 100;
+  const currentSection =
+    currentQuestionIndex >= questions.length
+      ? "Final Step"
+      : currentQuestion.section;
+  const CurrentIcon =
+    currentQuestionIndex >= questions.length
+      ? questions[questions.length - 1].icon
+      : currentQuestion.icon;
 
   return {
+    currentQuestionIndex,
+    setCurrentQuestionIndex,
     currentQuestion,
-    setCurrentQuestion,
-    answers,
-    setAnswers,
+    formData,
+    setFormData,
     selectedOptions,
     setSelectedOptions,
-    additionalInput,
-    setAdditionalInput,
-    maxCharacters,
+    additionalNotes,
+    setAdditionalNotes,
     handleOptionSelect,
     handleNext,
     handlePrevious,
+    saveCurrentAnswer,
     handleSubmit: handleSubmit as () => Promise<void>,
-    formatAnswersForSubmission,
-    createAssessmentSubmission,
     progress,
     currentSection,
     CurrentIcon,

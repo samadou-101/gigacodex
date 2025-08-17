@@ -3,20 +3,20 @@ import { useState } from "react";
 
 interface NavigationButtonsProps {
   currentQuestion: number;
-  questionsLength: number;
   selectedOptions: string[];
   handlePrevious: () => void;
   handleNext: () => void;
   handleSubmit: () => Promise<void>;
+  isLastQuestion: boolean;
 }
 
 export default function NavigationButtons({
   currentQuestion,
-  questionsLength,
   selectedOptions,
   handlePrevious,
   handleNext,
   handleSubmit,
+  isLastQuestion,
 }: NavigationButtonsProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -50,7 +50,7 @@ export default function NavigationButtons({
         <div />
       )}
 
-      {currentQuestion < questionsLength - 1 ? (
+      {!isLastQuestion ? (
         <button
           onClick={handleNext}
           disabled={selectedOptions.length === 0 || isSubmitting}

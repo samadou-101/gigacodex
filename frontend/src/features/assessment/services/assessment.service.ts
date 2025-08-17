@@ -1,41 +1,24 @@
-import { AssessmentSubmission } from "@shared/schemas/assessment";
+// services/assessment-service.ts
+import { AssessmentInput } from "@shared/schemas/assessment";
 import axios from "axios";
 import apiClient from "./api-client";
-import { AssessmentResponse, AssessmentResultData } from "./types";
+import { AssessmentResponse, AssessmentResultData } from "../types";
 
 export class AssessmentService {
   /**
    * Submit assessment to the backend
-   * @param submission - The assessment submission data
+   * @param submission - The assessment data
    * @returns Promise<AssessmentResponse>
    */
   static async submitAssessment(
-    submission: AssessmentSubmission
+    submission: AssessmentInput
   ): Promise<AssessmentResponse> {
     try {
-      // Validate required fields before sending
-      if (
-        !submission.name ||
-        !submission.age ||
-        !submission.experienceLevel ||
-        !submission.goals ||
-        !submission.timePerWeek ||
-        submission.hasComputer === undefined ||
-        !submission.preferredTrack ||
-        !submission.answers
-      ) {
-        return {
-          success: false,
-          error: "Missing required fields in assessment submission",
-        };
-      }
-
       console.log(
         "Sending assessment to backend:",
         JSON.stringify(submission, null, 2)
       );
 
-      // Send the submission data directly to the backend
       const response = await apiClient.post(
         "/api/assessment/submit",
         submission
@@ -48,9 +31,7 @@ export class AssessmentService {
     } catch (error) {
       console.error("Error submitting assessment:", error);
 
-      // Handle axios error response
       if (axios.isAxiosError(error)) {
-        console.error("Axios error details:", error.response?.data);
         return {
           success: false,
           error:
@@ -89,7 +70,6 @@ export class AssessmentService {
     } catch (error) {
       console.error("Error fetching assessment results:", error);
 
-      // Handle axios error response
       if (axios.isAxiosError(error)) {
         return {
           success: false,

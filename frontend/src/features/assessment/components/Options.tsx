@@ -1,16 +1,28 @@
 import { CheckCircle2 } from "lucide-react";
+import { assessmentLabels } from "@/app/get-started/assessment/assessment-labels";
 
 interface OptionsProps {
   options: string[];
   selectedOptions: string[];
   handleOptionSelect: (option: string) => void;
+  questionId: string;
 }
 
 export default function Options({
   options,
   selectedOptions,
   handleOptionSelect,
+  questionId,
 }: OptionsProps) {
+  const getLabel = (option: string) => {
+    const labels =
+      assessmentLabels[questionId as keyof typeof assessmentLabels];
+    if (labels && labels[option as keyof typeof labels]) {
+      return labels[option as keyof typeof labels];
+    }
+    return option;
+  };
+
   return (
     <div className="space-y-4 mb-8">
       {options.map((option, index) => (
@@ -42,7 +54,7 @@ export default function Options({
                   : "text-slate-700 dark:text-slate-300"
               }
             >
-              {option}
+              {getLabel(option)}
             </span>
           </div>
         </button>
