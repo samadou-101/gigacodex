@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from "express";
-import { signupSchema, loginSchema } from "./auth.types.js";
+import { signupSchema, loginSchema } from "./auth.schema.js";
 
 // Validation middleware for signup
 export const validateSignup = (

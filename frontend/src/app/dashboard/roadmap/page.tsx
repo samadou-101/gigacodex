@@ -319,7 +319,19 @@ export default function Roadmap() {
       <div className="h-full w-full" ref={reactFlowWrapper}>
         <ReactFlow
           onInit={(reactFlowInstance) => {
-            reactFlowInstance.fitView({ padding: 0.1 });
+            reactFlowInstance.fitView({ padding: 0.2 });
+
+            setTimeout(() => {
+              const v = reactFlowInstance.getViewport();
+
+              // Move content down visually by shifting viewport up
+              const topPadding = 100; // pixels to leave at top
+              reactFlowInstance.setViewport({
+                x: v.x,
+                y: v.y + topPadding / v.zoom, // adjust for zoom level
+                zoom: v.zoom * 1, // keep same zoom
+              });
+            }, 50);
           }}
           nodes={nodes}
           edges={edges}
@@ -330,9 +342,9 @@ export default function Roadmap() {
           onNodeClick={onNodeClick}
           nodeTypes={nodeTypes}
           edgeTypes={edgeTypes}
-          fitView
+          // fitView
           fitViewOptions={{ padding: 1.5, minZoom: 0.1, maxZoom: 2 }}
-          defaultViewport={{ x: 0, y: 0, zoom: 0.55 }}
+          // defaultViewport={{ x: 0, y: 0, zoom: 0.55 }}
           minZoom={0.1}
           maxZoom={2}
           className="bg-transparent"

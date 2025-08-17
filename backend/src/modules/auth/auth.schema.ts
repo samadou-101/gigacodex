@@ -11,13 +11,11 @@ export const signupSchema = z.object({
     .min(2, "Last name must be at least 2 characters")
     .max(50, "Last name must be less than 50 characters"),
   email: z.string().email("Invalid email format"),
-  password: z
-    .string()
-    .min(8, "Password must be at least 8 characters")
-    .regex(
-      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/,
-      "Password must contain at least one lowercase letter, one uppercase letter, and one number"
-    ),
+  password: z.string().min(6, "Password must be at least 8 characters"),
+  // .regex(
+  //   /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/,
+  //   "Password must contain at least one lowercase letter, one uppercase letter, and one number"
+  // ),
 });
 
 // Login validation schema

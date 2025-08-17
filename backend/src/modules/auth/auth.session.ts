@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { SessionUser } from "./auth.types.js";
+import { SessionUser } from "./auth.schema.js";
 
 // Session management utilities
 export class SessionService {

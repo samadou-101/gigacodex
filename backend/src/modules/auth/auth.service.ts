@@ -1,6 +1,6 @@
 import bcrypt from "bcrypt";
 import prisma from "../../config/db.config.js";
-import { SignupRequest, LoginRequest, SessionUser } from "./auth.types.js";
+import { SignupRequest, LoginRequest, SessionUser } from "./auth.schema.js";
 
 export class AuthService {
   // Signup user

@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from "express";
-import { SessionUser } from "./auth.types.js";
+import { SessionUser } from "./auth.schema.js";
 
 // Middleware to check if user is authenticated
 export const isAuthenticated = (

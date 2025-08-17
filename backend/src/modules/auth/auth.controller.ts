@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import { AuthService } from "./auth.service.js";
 import { SessionService } from "./auth.session.js";
-import { SignupRequest, LoginRequest } from "./auth.types.js";
+import { SignupRequest, LoginRequest } from "./auth.schema.js";
 
 export const signup = async (req: Request, res: Response): Promise<void> => {
   try {
