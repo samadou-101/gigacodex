@@ -33,8 +33,6 @@ export const aiController = async (req: Request, res: Response) => {
   try {
     const userId = req.session.user?.id;
     if (userId) {
-      // If AI response includes a roadmap compatible with React Flow,
-      // persist it for this user so the dashboard can load it later.
       const maybeRoadmap = (data && (data as any).roadmap) || null;
       if (maybeRoadmap && typeof maybeRoadmap === "object") {
         const reactFlowRoadmap = toReactFlowRoadmap(maybeRoadmap);
@@ -42,7 +40,6 @@ export const aiController = async (req: Request, res: Response) => {
       }
     }
   } catch (err) {
-    // Non-fatal: saving roadmap should not block returning assessment results
     console.error("Failed to save roadmap from assessment:", err);
   }
 
