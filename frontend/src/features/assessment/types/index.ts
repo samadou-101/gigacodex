@@ -36,6 +36,6 @@ export interface Question {
   question: string;
   options: string[];
   type: QuestionType;
-  icon: any; // keep any to avoid frontend dependency (LucideIcon)
+  icon: any;
   additionalInput?: string;
 }
