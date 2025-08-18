@@ -3,16 +3,11 @@ import { useState, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
 import {
-  ArrowRight,
   Brain,
   Code2,
   Target,
   Sparkles,
-  CheckCircle2,
   Clock,
-  Zap,
-  Map,
-  TrendingUp,
   AlertCircle,
 } from "lucide-react";
 import { ThemeToggle } from "@/components/ThemeToggle";
@@ -20,12 +15,14 @@ import {
   AssessmentService,
   AssessmentResultData,
 } from "@/features/assessment/services";
+import ResultCard from "@/features/assessment/components/result/ResultCard";
+import Insights from "@/features/assessment/components/result/Insights";
+import RoadmapList from "@/features/assessment/components/result/RoadmapList";
+import CTA from "@/features/assessment/components/result/CTA";
 
 export default function AssessmentResults() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  // const [isEditing, setIsEditing] = useState(false);
-  // const [editedGoal, setEditedGoal] = useState("Become a Backend Developer");
   const [assessmentId, setAssessmentId] = useState<string | null>(null);
   const [directResults, setDirectResults] =
     useState<AssessmentResultData | null>(null);
@@ -102,14 +99,6 @@ export default function AssessmentResults() {
       console.log("Roadmap:", assessmentData?.roadmap);
     }
   }, [results, assessmentData]);
-
-  // Clear session storage only after successful data extraction
-  // useEffect(() => {
-  //   if (assessmentData && directResults) {
-  //     sessionStorage.removeItem("assessmentResults");
-  //     console.log("Cleared session storage after successful data extraction");
-  //   }
-  // }, [assessmentData, directResults]);
 
   const handleDashboardClick = () => {
     router.push("/dashboard");
@@ -213,256 +202,49 @@ export default function AssessmentResults() {
         {/* Results Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
           {/* Skill Level Card */}
-          <div className="bg-white/60 dark:bg-slate-800/60 backdrop-blur-sm rounded-2xl border border-slate-200/50 dark:border-slate-700/50 p-6 hover:border-blue-300 dark:hover:border-blue-600 transition-all duration-300">
-            <div className="flex items-center mb-4">
-              <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-cyan-500 rounded-xl flex items-center justify-center mr-4">
-                <Code2 className="h-6 w-6 text-white" />
-              </div>
-              <div>
-                <h3 className="text-lg font-semibold text-slate-900 dark:text-white">
-                  Current Skill Level
-                </h3>
-                <p className="text-blue-600 dark:text-blue-400 font-medium">
-                  {assessmentData?.skillLevel}
-                </p>
-              </div>
-            </div>
-            <div className="space-y-2">
-              <div className="flex items-center text-slate-600 dark:text-slate-300">
-                <CheckCircle2 className="w-4 h-4 text-green-500 mr-2" />
-                <span>
-                  Strong in{" "}
-                  {assessmentData?.preferredLanguages?.join(", ") ||
-                    "programming"}
-                </span>
-              </div>
-              <div className="flex items-center text-slate-600 dark:text-slate-300">
-                <CheckCircle2 className="w-4 h-4 text-green-500 mr-2" />
-                <span>
-                  Ready for{" "}
-                  {assessmentData?.skillLevel === "Beginner"
-                    ? "basic concepts"
-                    : "advanced concepts"}
-                </span>
-              </div>
-            </div>
-          </div>
+          <ResultCard
+            title="Current Skill Level"
+            icon={<Code2 className="h-6 w-6 text-white" />}
+            iconBg="from-blue-500 to-cyan-500"
+            skillLevel={assessmentData?.skillLevel}
+            notes={assessmentData?.preferredLanguages || ["programming"]}
+          />
 
-          {/* Learning Style Card */}
-          <div className="bg-white/60 dark:bg-slate-800/60 backdrop-blur-sm rounded-2xl border border-slate-200/50 dark:border-slate-700/50 p-6 hover:border-blue-300 dark:hover:border-blue-600 transition-all duration-300">
-            <div className="flex items-center mb-4">
-              <div className="w-12 h-12 bg-gradient-to-br from-purple-500 to-pink-500 rounded-xl flex items-center justify-center mr-4">
-                <Brain className="h-6 w-6 text-white" />
-              </div>
-              <div>
-                <h3 className="text-lg font-semibold text-slate-900 dark:text-white">
-                  Learning Style
-                </h3>
-                <p className="text-purple-600 dark:text-purple-400 font-medium">
-                  {assessmentData?.learningStyle}
-                </p>
-              </div>
-            </div>
-            <div className="space-y-2">
-              <div className="flex items-center text-slate-600 dark:text-slate-300">
-                <CheckCircle2 className="w-4 h-4 text-green-500 mr-2" />
-                <span>Hands-on approach preferred</span>
-              </div>
-              <div className="flex items-center text-slate-600 dark:text-slate-300">
-                <CheckCircle2 className="w-4 h-4 text-green-500 mr-2" />
-                <span>Learn by building real projects</span>
-              </div>
-            </div>
-          </div>
+          <ResultCard
+            title="Learning Style"
+            icon={<Brain className="h-6 w-6 text-white" />}
+            iconBg="from-purple-500 to-pink-500"
+            skillLevel={assessmentData?.learningStyle}
+            notes={[
+              "Hands-on approach preferred",
+              "Learn by building real projects",
+            ]}
+          />
 
-          {/* Time Commitment Card */}
-          <div className="bg-white/60 dark:bg-slate-800/60 backdrop-blur-sm rounded-2xl border border-slate-200/50 dark:border-slate-700/50 p-6 hover:border-blue-300 dark:hover:border-blue-600 transition-all duration-300">
-            <div className="flex items-center mb-4">
-              <div className="w-12 h-12 bg-gradient-to-br from-green-500 to-emerald-500 rounded-xl flex items-center justify-center mr-4">
-                <Clock className="h-6 w-6 text-white" />
-              </div>
-              <div>
-                <h3 className="text-lg font-semibold text-slate-900 dark:text-white">
-                  Time Commitment
-                </h3>
-                <p className="text-green-600 dark:text-green-400 font-medium">
-                  {assessmentData?.timeCommitment}
-                </p>
-              </div>
-            </div>
-            <div className="space-y-2">
-              <div className="flex items-center text-slate-600 dark:text-slate-300">
-                <CheckCircle2 className="w-4 h-4 text-green-500 mr-2" />
-                <span>Consistent weekly schedule</span>
-              </div>
-              <div className="flex items-center text-slate-600 dark:text-slate-300">
-                <CheckCircle2 className="w-4 h-4 text-green-500 mr-2" />
-                <span>Good for steady progress</span>
-              </div>
-            </div>
-          </div>
+          <ResultCard
+            title="Time Commitment"
+            icon={<Clock className="h-6 w-6 text-white" />}
+            iconBg="from-green-500 to-emerald-500"
+            skillLevel={assessmentData?.timeCommitment}
+            notes={["Consistent weekly schedule", "Good for steady progress"]}
+          />
 
-          {/* Goal Clarity Card */}
-          <div className="bg-white/60 dark:bg-slate-800/60 backdrop-blur-sm rounded-2xl border border-slate-200/50 dark:border-slate-700/50 p-6 hover:border-blue-300 dark:hover:border-blue-600 transition-all duration-300">
-            <div className="flex items-center mb-4">
-              <div className="w-12 h-12 bg-gradient-to-br from-orange-500 to-red-500 rounded-xl flex items-center justify-center mr-4">
-                <Target className="h-6 w-6 text-white" />
-              </div>
-              <div>
-                <h3 className="text-lg font-semibold text-slate-900 dark:text-white">
-                  Goal Clarity
-                </h3>
-                <p className="text-orange-600 dark:text-orange-400 font-medium">
-                  {assessmentData?.goalClarity}
-                </p>
-              </div>
-            </div>
-            <div className="space-y-2">
-              <div className="flex items-center text-slate-600 dark:text-slate-300">
-                <CheckCircle2 className="w-4 h-4 text-green-500 mr-2" />
-                <span>Clear career direction</span>
-              </div>
-              <div className="flex items-center text-slate-600 dark:text-slate-300">
-                <CheckCircle2 className="w-4 h-4 text-green-500 mr-2" />
-                <span>Specific learning objectives</span>
-              </div>
-            </div>
-          </div>
+          <ResultCard
+            title="Goal Clarity"
+            icon={<Target className="h-6 w-6 text-white" />}
+            iconBg="from-orange-500 to-red-500"
+            skillLevel={assessmentData?.goalClarity}
+            notes={["Clear career direction", "Specific learning objectives"]}
+          />
         </div>
 
         {/* Personalized Insights */}
-        <div className="bg-white/60 dark:bg-slate-800/60 backdrop-blur-sm rounded-2xl border border-slate-200/50 dark:border-slate-700/50 p-8 mb-12">
-          <div className="flex items-center mb-6">
-            <div className="w-12 h-12 bg-gradient-to-br from-indigo-500 to-purple-500 rounded-xl flex items-center justify-center mr-4">
-              <Sparkles className="h-6 w-6 text-white" />
-            </div>
-            <h2 className="text-2xl font-bold text-slate-900 dark:text-white">
-              Personalized Insights
-            </h2>
-          </div>
-          <div className="space-y-4">
-            {assessmentData?.insights?.map(
-              (insight: { title: string; content: string }, index: number) => (
-                <div
-                  key={index}
-                  className="flex items-start p-4 bg-slate-50 dark:bg-slate-900/50 rounded-xl"
-                >
-                  <div className="w-6 h-6 bg-gradient-to-br from-blue-500 to-indigo-500 rounded-full flex items-center justify-center mr-3 mt-1">
-                    <CheckCircle2 className="w-4 h-4 text-white" />
-                  </div>
-                  <p className="text-slate-700 dark:text-slate-300">
-                    {insight?.content}
-                  </p>
-                </div>
-              )
-            )}
-          </div>
-        </div>
+        <Insights insights={assessmentData?.insights} />
 
         {/* Learning Roadmap */}
-        {assessmentData?.roadmap && (
-          <div className="bg-white/60 dark:bg-slate-800/60 backdrop-blur-sm rounded-2xl border border-slate-200/50 dark:border-slate-700/50 p-8 mb-12">
-            <div className="flex items-center mb-6">
-              <div className="w-12 h-12 bg-gradient-to-br from-emerald-500 to-teal-500 rounded-xl flex items-center justify-center mr-4">
-                <Map className="h-6 w-6 text-white" />
-              </div>
-              <h2 className="text-2xl font-bold text-slate-900 dark:text-white">
-                Your Learning Roadmap
-              </h2>
-            </div>
-            <div className="space-y-6">
-              {assessmentData.roadmap.map(
-                (
-                  step: {
-                    description: string;
-                    durationEstimate: number;
-                    title: string;
-                  },
-                  index: number
-                ) => (
-                  <div
-                    key={index}
-                    className="relative p-6 bg-slate-50 dark:bg-slate-900/50 rounded-xl border-l-4 border-emerald-500"
-                  >
-                    <div className="flex items-center justify-between mb-4">
-                      <div className="flex items-center">
-                        <div className="w-8 h-8 bg-emerald-500 rounded-full flex items-center justify-center mr-3">
-                          <span className="text-white font-bold text-sm">
-                            {index + 1}
-                          </span>
-                        </div>
-                        <h3 className="text-lg font-semibold text-slate-900 dark:text-white">
-                          {step.title}
-                        </h3>
-                      </div>
-                      {/* <span className="text-sm text-emerald-600 dark:text-emerald-400 font-medium">
-                        {step.durationEstimate}
-                      </span> */}
-                    </div>
-                    <div className="grid grid-cols-1 md:grid-cols-1 ">
-                      <div
-                        key={index}
-                        className="flex items-center gap-x-4 bg-white/60 dark:bg-slate-800/60 rounded-lg"
-                      >
-                        <TrendingUp className="w-8 h-8 text-emerald-500 mr-2" />
-                        <span className="text-slate-700 dark:text-slate-300">
-                          {step.description}
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-                )
-              )}
-            </div>
-          </div>
-        )}
-
-        {/* Goal Confirmation */}
-        {/* <div className="bg-white/60 dark:bg-slate-800/60 backdrop-blur-sm rounded-2xl border border-slate-200/50 dark:border-slate-700/50 p-8 mb-12">
-          <div className="flex items-center justify-between mb-6">
-            <div className="flex items-center">
-              <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-indigo-500 rounded-xl flex items-center justify-center mr-4">
-                <Compass className="h-6 w-6 text-white" />
-              </div>
-              <h2 className="text-2xl font-bold text-slate-900 dark:text-white">
-                Your Learning Goal
-              </h2>
-            </div>
-            <button
-              onClick={() => setIsEditing(!isEditing)}
-              className="px-4 py-2 text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 font-medium transition-colors duration-300"
-            >
-              {isEditing ? "Save" : "Edit"}
-            </button>
-          </div>
-          {isEditing ? (
-            <input
-              type="text"
-              value={editedGoal}
-              onChange={(e) => setEditedGoal(e.target.value)}
-              className="w-full p-4 rounded-xl border-2 border-blue-200 dark:border-blue-800 bg-white/60 dark:bg-slate-800/60 focus:border-blue-500 dark:focus:border-blue-400 focus:ring-2 focus:ring-blue-500/20 dark:focus:ring-blue-400/20 transition-all duration-300 text-slate-700 dark:text-slate-300"
-            />
-          ) : (
-            <p className="text-xl text-slate-700 dark:text-slate-300">
-              {editedGoal}
-            </p>
-          )}
-        </div> */}
-
+        <RoadmapList steps={assessmentData?.roadmap} />
         {/* CTA Button */}
-        <div className="text-center">
-          <button
-            onClick={handleDashboardClick}
-            className="group relative px-8 py-4 bg-gradient-to-r from-blue-600 to-blue-800 hover:from-blue-700 hover:to-blue-900 text-white rounded-2xl font-semibold text-lg transition-all duration-300 hover:scale-105 shadow-xl shadow-blue-500/25 hover:shadow-2xl hover:shadow-blue-500/40 overflow-hidden"
-          >
-            <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/20 to-white/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000 opacity-50 dark:opacity-20"></div>
-            <div className="relative flex items-center">
-              <Zap className="mr-3 h-6 w-6" />
-              Go to My Dashboard
-              <ArrowRight className="ml-3 h-5 w-5 group-hover:translate-x-1 transition-transform duration-300" />
-            </div>
-          </button>
-        </div>
+        <CTA handleDashboardClick={handleDashboardClick} />
       </div>
     </div>
   );

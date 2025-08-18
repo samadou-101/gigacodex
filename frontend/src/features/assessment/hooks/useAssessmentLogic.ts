@@ -97,34 +97,6 @@ export function useAssessmentLogic() {
       // Generate a proper UUID format
       const tempUserId = crypto.randomUUID();
 
-      // Check if all required fields are present
-      const requiredFields: (keyof AssessmentInput)[] = [
-        "codingConfidence",
-        "programmingLanguages",
-        "csUnderstanding",
-        "csTopics",
-        "problemSolving",
-        "tools",
-        "weeklyCommitment",
-        "mainGoal",
-        "confidence",
-        "interests",
-        "learningStyle",
-      ];
-
-      const missingFields = requiredFields.filter(
-        (field) => !formDataWithCurrent[field]
-      );
-
-      if (missingFields.length > 0) {
-        console.error("Missing required fields:", missingFields);
-        throw new Error(
-          `Please complete all questions before submitting. Missing: ${missingFields.join(
-            ", "
-          )}`
-        );
-      }
-
       const data: AssessmentInput = {
         ...formDataWithCurrent,
         userId: tempUserId,
@@ -164,7 +136,7 @@ export function useAssessmentLogic() {
   const progress =
     currentQuestionIndex >= questions.length
       ? 100
-      : ((currentQuestionIndex + 1) / questions.length) * 100;
+      : (currentQuestionIndex / questions.length) * 100;
   const currentSection =
     currentQuestionIndex >= questions.length
       ? "Final Step"
