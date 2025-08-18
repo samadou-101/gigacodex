@@ -1,7 +1,7 @@
 // services/assessment-service.ts
 import { AssessmentInput } from "@shared/schemas/assessment";
 import axios from "axios";
-import apiClient from "./api-client";
+import apiClient from "../../../lib/api-client";
 import { AssessmentResponse, AssessmentResultData } from "../types";
 
 export class AssessmentService {

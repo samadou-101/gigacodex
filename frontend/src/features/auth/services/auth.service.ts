@@ -1,4 +1,4 @@
-import apiClient from "@/features/assessment/services/api-client";
+import apiClient from "@/lib/api-client";
 
 export interface LoginPayload {
   email: string;

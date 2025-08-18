@@ -5,4 +5,4 @@ export * from "../types";
 export { AssessmentService } from "./assessment.service";
 
 // Export API client
-export { default as apiClient } from "./api-client";
+export { default as apiClient } from "../../../lib/api-client";

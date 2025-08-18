@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import apiClient from "@/features/assessment/services/api-client";
+import apiClient from "@/lib/api-client";
 import type { Edge, Node } from "reactflow";
 import { normalizeRoadmapPayload } from "./transform";
 import type { ReactFlowRoadmap } from "@shared/schemas/roadmap";
