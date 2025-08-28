@@ -3,6 +3,7 @@ dotenv.config();
 import app from "./app.js";
 import { testDatabaseConnection } from "./config/db.config.js";
 import { redisConnection } from "./config/redis.config.js";
+import { runWorkers } from "./modules/ai/generation/workers/index.js";
 
 const PORT = process.env.PORT || 4000;
 
@@ -15,7 +16,7 @@ async function startServer() {
   }
 
   await redisConnection();
-
+  await runWorkers();
   app.listen(PORT, () => {
     console.log(` Server is running on http://localhost:${PORT}`);
   });

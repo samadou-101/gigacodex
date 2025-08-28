@@ -4,7 +4,7 @@ import { Worker } from "bullmq";
 const planWorker = new Worker(
   "planQueue",
   async (job) => {
-    console.log(job);
+    console.log(job.data);
   },
   { connection: redis }
 );
