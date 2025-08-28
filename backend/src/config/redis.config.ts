@@ -1,16 +1,18 @@
-import { createClient } from "redis";
+import { Redis } from "ioredis";
 
-const client = createClient({ url: process.env.REDIS_URL });
+const redisUrl = process.env.REDIS_URL;
+if (!redisUrl) throw new Error("REDIS_URL is not defined");
 
-client.on("error", (err) => console.log("Redis Client Error", err));
+const redis = new Redis(redisUrl);
 
 const redisConnection = async () => {
   try {
-    await client.connect();
-    console.log("Reis Server Connected");
-  } catch (error) {
-    console.log("Redis Connection Failed", error);
+    await redis.ping();
+    console.log(" Redis server connected");
+  } catch (err) {
+    console.error("Redis connection failed", err);
+    throw err;
   }
 };
 
-export { client, redisConnection };
+export { redisConnection, redis };
