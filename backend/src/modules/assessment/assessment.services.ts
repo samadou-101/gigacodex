@@ -1,5 +1,5 @@
 import { AssessmentInput } from "@shared/schemas/assessment.js";
-import { getRoadmapPrompt } from "../ai/llm/roadmap/index.js";
+import { getRoadmapPrompt } from "../ai/generation/roadmap/index.js";
 import {
   ReactFlowRoadmapSchema,
   RoadmapList,

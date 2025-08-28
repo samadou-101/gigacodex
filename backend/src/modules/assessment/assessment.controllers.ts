@@ -20,12 +20,11 @@ export const generateAIPrompt = (
 };
 
 export const aiController = async (req: Request, res: Response) => {
-  // const assessment: Assessment = req.body;
   const prompt = req.body.prompt;
   const data = await getGeminiAIResponse(prompt);
   const assessmentId = `assessment_${Date.now()}_${Math.random()
     .toString(36)
-    .substr(2, 9)}`;
+    .slice(2, 11)}`;
 
   try {
     const userId = req.session.user?.id;
