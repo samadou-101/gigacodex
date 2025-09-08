@@ -6,7 +6,7 @@ export const validateAssessment = (
   res: Response,
   next: NextFunction
 ) => {
-  console.log("Received assessment data:", JSON.stringify(req.body, null, 2));
+  // console.log("Received assessment data:", JSON.stringify(req.body, null, 2));
 
   const validationResult = AssessmentSchema.safeParse(req.body);
 

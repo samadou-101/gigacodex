@@ -24,7 +24,7 @@ export const generateAIPrompt = (
 export const aiController = async (req: Request, res: Response) => {
   const prompt = req.body.prompt;
   const data: RoadmapType = await getGeminiAIResponse(prompt);
-  await planQueue.add("generatePlan", data);
+  await planQueue.add("generatePlan", { data, userId: req.session.user?.id });
   const assessmentId = `assessment_${Date.now()}_${Math.random()
     .toString(36)
     .slice(2, 11)}`;

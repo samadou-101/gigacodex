@@ -19,4 +19,5 @@ const PlanSchema = z.object({
   ),
 });
 
+export type LearningPlanType = z.infer<typeof PlanSchema>;
 export { PlanSchema };

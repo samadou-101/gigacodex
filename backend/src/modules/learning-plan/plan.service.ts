@@ -1,6 +1,9 @@
 import { ai } from "@/config/ai.config.js";
 import { RoadmapType } from "../roadmap/schema/roadmap.schema.js";
 import { Type } from "@google/genai";
+import { LearningPlanType } from "./plan.schema.js";
+import prisma from "@/config/db.config.js";
+import { redis } from "@/config/redis.config.js";
 
 const planPrompt = (roadmap: RoadmapType) => {
   const roadmapSummary = roadmap
@@ -87,4 +90,30 @@ export const generatePlan = async (roadmap: RoadmapType) => {
   return response.text;
 };
 
-export const savePlanToDB = async () => {};
+export const savePlanToDB = async (
+  userId: number,
+  planData: LearningPlanType
+) => {
+  try {
+    const result = await prisma.learningPlan.upsert({
+      where: { userId },
+      update: { learningPlan_data: planData },
+      create: { userId, learningPlan_data: planData },
+    });
+    return result;
+  } catch (error) {
+    throw new Error("error when updating or creating the learningp plan");
+  }
+};
+
+export const savePlanToCache = async (
+  userId: number,
+  planData: LearningPlanType
+) => {
+  try {
+    await redis.set(`learningPlan:${userId}`, JSON.stringify(planData));
+    console.log(`Plan cached for user ${userId}`);
+  } catch (error) {
+    console.error("Error saving plan to Redis:", error);
+  }
+};

@@ -1,28 +1,42 @@
-datasource db {
-  provider = "postgresql"
-//  url      = env("DATABASE_URL")
-//  url      = env("PRODUCTION_DB_URL")
-  url  = env("DIRECT_URL")
-}
-
 generator client {
   provider = "prisma-client-js"
 }
 
+datasource db {
+  provider = "postgresql"
+  url      = env("DIRECT_URL")
+}
+
 model User {
-  id        Int      @id @default(autoincrement())
-  firstName String
-  lastName  String
-  email     String   @unique
-  password  String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  roadmap Roadmap?
-} 
+  id           Int           @id @default(autoincrement())
+  firstName    String
+  lastName     String
+  email        String        @unique
+  password     String
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  roadmap      Roadmap?
+  learningPlan LearningPlan?
+}
+
+model session {
+  sid    String   @id @db.VarChar
+  sess   Json     @db.Json
+  expire DateTime @db.Timestamp(6)
+
+  @@index([expire], map: "IDX_session_expire")
+}
 
 model Roadmap {
-  id Int @id @default(autoincrement())
-  user User @relation(fields: [userId], references: [id])
-  userId Int @unique
-  roadmap_data Json 
+  id           Int  @id @default(autoincrement())
+  userId       Int  @unique
+  roadmap_data Json
+  user         User @relation(fields: [userId], references: [id])
+}
+
+model LearningPlan {
+  id           Int  @id @default(autoincrement())
+  userId       Int  @unique
+  learningPlan_data Json
+  user         User @relation(fields: [userId], references: [id])
 }
