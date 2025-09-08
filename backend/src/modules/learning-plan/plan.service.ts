@@ -11,23 +11,22 @@ const planPrompt = (roadmap: RoadmapType) => {
     .join("\n");
 
   const prompt = `
-You are an expert in creating detailed learning plans. Based on the following roadmap, generate a comprehensive plan.
+You are an expert in creating structured learning plans. Based on the following roadmap, generate a practical learning plan.
 
 ### Roadmap:
 ${roadmapSummary}
 
-### Requirements for the plan:
+### Requirements:
 - For each roadmap item:
   - Use its title as "nodeTitle"
-  - Use its description for "description"
-  - Generate a list of "concepts" (3-6 concepts per node), each with:
-    - "name" (concept title)
-    - "subTopics" (1 to 5 detailed subtopics)
-  - Include "whyImportant" for each node
+  - Use its description as "description"
+  - Generate a list of "topics" (the essential skills or concepts for that stage)
+  - Include "whyImportant" (1-2 sentences explaining its importance)
+- Do NOT include subtopics, resources, or time estimates.
+- Keep the topics focused and actionable, avoid vague terms.
+- Ensure every roadmap item has all required fields.
 
-Keep the plan practical, focused on guiding a beginner or intermediate learner, and avoid resource links or time estimates.
 `;
-
   return prompt;
 };
 
@@ -52,34 +51,17 @@ export const generatePlan = async (roadmap: RoadmapType) => {
                 description: {
                   type: Type.STRING,
                 },
-                concepts: {
+                topics: {
                   type: Type.ARRAY,
                   items: {
-                    type: Type.OBJECT,
-                    properties: {
-                      name: {
-                        type: Type.STRING,
-                      },
-                      subTopics: {
-                        type: Type.ARRAY,
-                        items: {
-                          type: Type.STRING,
-                        },
-                      },
-                    },
-                    required: ["name", "subTopics"],
+                    type: Type.STRING,
                   },
                 },
                 whyImportant: {
                   type: Type.STRING,
                 },
               },
-              required: [
-                "nodeTitle",
-                "description",
-                "concepts",
-                "whyImportant",
-              ],
+              required: ["nodeTitle", "description", "topics", "whyImportant"],
             },
           },
         },

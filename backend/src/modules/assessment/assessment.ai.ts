@@ -40,11 +40,8 @@ export async function getGeminiAIResponse(prompt: string) {
                 description: {
                   type: Type.STRING,
                 },
-                durationEstimate: {
-                  type: Type.NUMBER,
-                },
               },
-              required: ["title", "description", "durationEstimate"],
+              required: ["title", "description"],
             },
           },
         },

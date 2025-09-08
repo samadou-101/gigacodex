@@ -1,20 +1,19 @@
 import { z } from "zod";
 
+const TopicSchema = z.object({
+  title: z.string().min(1, "Topic title is required"),
+  details: z.string().min(1, "Topic details are required"),
+});
+
 const PlanSchema = z.object({
   plan: z.array(
     z.object({
-      nodeTitle: z.string(),
-      description: z.string(),
-      concepts: z.array(
-        z.object({
-          name: z.string(),
-          subTopics: z
-            .array(z.string())
-            .min(1, "Each concept must have at least 1 subtopic")
-            .max(5, "Each concept can have at most 5 subtopics"),
-        })
-      ),
-      whyImportant: z.string(),
+      nodeTitle: z.string().min(1, "Node title is required"),
+      description: z.string().min(1, "Description is required"),
+      whyImportant: z.string().min(1, "Why Important is required"),
+      topics: z
+        .array(TopicSchema)
+        .min(1, "Each node must have at least one topic"),
     })
   ),
 });
