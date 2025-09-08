@@ -1,4 +1,4 @@
-import { BadRequestError, DatabaseError } from "@/shared/errors/AppError.js";
+import { DatabaseError } from "@/shared/errors/AppError.js";
 import type { ReactFlowRoadmap } from "@shared/schemas/roadmap.js";
 import prisma from "@/config/db.config.js";
 // import { BadRequestError } from "@shared/errors/AppError.js";

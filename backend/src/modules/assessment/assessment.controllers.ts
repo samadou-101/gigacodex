@@ -8,6 +8,7 @@ import { AssessmentInput } from "@shared/schemas/assessment.js";
 import { getGeminiAIResponse } from "./assessment.ai.js";
 import { RoadmapService } from "@modules/roadmap/services/roadmap.service.js";
 import { planQueue } from "../ai/generation/queues/plan.queue.js";
+import { RoadmapType } from "../roadmap/schema/roadmap.schema.js";
 
 export const generateAIPrompt = (
   req: Request,
@@ -22,7 +23,7 @@ export const generateAIPrompt = (
 
 export const aiController = async (req: Request, res: Response) => {
   const prompt = req.body.prompt;
-  const data = await getGeminiAIResponse(prompt);
+  const data: RoadmapType = await getGeminiAIResponse(prompt);
   await planQueue.add("generatePlan", data);
   const assessmentId = `assessment_${Date.now()}_${Math.random()
     .toString(36)
