@@ -20,8 +20,8 @@ const planWorker = new Worker(
       }
       const parsedResult =
         typeof result === "string" ? JSON.parse(result) : result;
-
       const savedLearningPlan = await savePlanToDB(userId, parsedResult);
+
       if (!savedLearningPlan)
         throw new Error("error while saving plan to db from worker");
 
