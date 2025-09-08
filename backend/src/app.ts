@@ -9,6 +9,7 @@ import sessionConfig from "./config/session.config.js";
 import authRoutes from "./modules/auth/auth.routes.js";
 import assessmentRouter from "./modules/assessment/assessment.routes.js";
 import roadmapRouter from "./modules/roadmap/routes/roadmap.route.js";
+import planRouter from "./modules/learning-plan/plan.route.js";
 
 const app = express();
 
@@ -31,6 +32,7 @@ app.use(session(sessionConfig));
 app.use("/api/auth", authRoutes);
 app.use("/api/assessment", assessmentRouter);
 app.use("/api/roadmap", roadmapRouter);
+app.use("/api/plan", planRouter);
 app.get("/", (req, res) => {
   res.send("Welcome");
 });

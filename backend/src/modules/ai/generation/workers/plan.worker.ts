@@ -5,8 +5,6 @@ import {
   savePlanToCache,
   savePlanToDB,
 } from "@/modules/learning-plan/plan.service.js";
-import { PrismaClientValidationError } from "@prisma/client/runtime/library";
-import { JsonWebTokenError } from "jsonwebtoken";
 
 const planWorker = new Worker(
   "planQueue",

@@ -117,3 +117,21 @@ export const savePlanToCache = async (
     console.error("Error saving plan to Redis:", error);
   }
 };
+
+export const loadPlanFromDB = async (userId: number) => {
+  try {
+    const result = await prisma.learningPlan.findUnique({ where: { userId } });
+    return result;
+  } catch (error: any) {
+    throw new Error("Retrieving Plan from DB failed", error);
+  }
+};
+
+export const loadPlanFromCache = async (userId: number) => {
+  try {
+    const result = await redis.get(`learningPlan:${userId}`);
+    return result;
+  } catch (error: any) {
+    throw new Error("Retrieving Plan from Redis failed", error);
+  }
+};
